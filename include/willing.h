@@ -1,0 +1,6 @@
+#ifndef INCLUDE_WILLING_H
+#define INCLUDE_WILLING_H
+
+#define WILLING_OS_KERNEL_VERSION "V0.0.1"
+
+#endif
