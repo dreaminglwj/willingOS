@@ -2,5 +2,6 @@
 #define WILLING_OS_CONFIG_H
 
 #define MAX_TASK_NAME_LEN (16) 
+#define MAX_PRIORITY_NUM  (32)
 
 #endif
