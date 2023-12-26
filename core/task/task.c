@@ -142,3 +142,25 @@ static void addTaskToReadyArray( TCB_t * tcb ) {
 
     taskArrayForTest[taskNum++] = tcb
 }
+
+/*  
+    统时钟服务函数，
+    调度算法函数在这个函数中调用
+*/
+Base_t sysTickService( void ) {
+    Base_t needSwitchCtx = wFALSE;
+    // 暂时默认需要切换
+    needSwitchCtx = wTRUE;
+
+    return needSwitchCtx
+}
+
+
+
+Base_t getSchedulerState( void ) {
+    Base_t rlt = wFALSE;
+
+    /* todo: 完成具体实现 */
+    rlt = wTRUE;
+    return rlt;
+}
