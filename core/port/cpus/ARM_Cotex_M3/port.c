@@ -2,9 +2,12 @@
 #include "coreDef.h"
 #include "task.h"
 #include "willing.h"
+#include "willingOSConfig.h"
 
 #define INITIAL_XPSR			( 0x01000000 )
 #define START_ADDRESS_MASK		( ( Stack_t ) 0xfffffffeUL )
+/* ICSR寄存器中除了VECTACTIVE位之外的其他所有位的掩码 */
+#define ICSR_NONE_VECTOR_ACTIVE_MASK ( 0xFFUL )
 
 Stack_t *initStack( Stack_t *topOfStack, TaskFunc_t taskFunc, void *params )
 {
@@ -81,26 +84,95 @@ Base_t startScheduler( void ) {
 }
 
 void stopScheduler( void ) {
-
+    willingAssert(criticalNesting==1000UL);
 }
 
 void enterCriticalSection( void ) {
+    __asm("cpsid i");  /* 关中断 */
 
+    criticalNesting++;
+
+    if ( criticalNesting == 1 ) {
+        willingAssert( (NVIC_INTERRUPUT_CTRL_REG & ICSR_NONE_VECTOR_ACTIVE_MASK ) == 0 );
+    }
 } 
 
 void exitCriticalSection( void ) {
-
+    willingAssert(criticalNesting);
+    criticalNesting--;
+    if ( criticalNesting == 0 ) {
+       __asm( "cpsie i" );  /* 开中断 */
+    }
 }
 
 /* 用于启动第一个任务 */
 __asm void SVCHandler( void ) {
+	PRESERVE8
 
+	ldr	r3, =currentTCB	/* Restore the context. */
+	ldr r1, [r3]			/* Use pxCurrentTCBConst to get the pxCurrentTCB address. */
+	ldr r0, [r1]			/* The first item in pxCurrentTCB is the task top of stack. */
+	ldmia r0!, {r4-r11}		/* Pop the registers that are not automatically saved on exception entry and the critical nesting count. */
+	msr psp, r0				/* Restore the task stack pointer. */
+	isb
+	mov r0, #0
+	msr	basepri, r0
+	orr r14, #0xd
+	bx r14
 }
 
 __asm startFirstTask( void ) {
-    
+	PRESERVE8
+
+	/* Use the NVIC offset register to locate the stack. */
+	ldr r0, =0xE000ED08
+	ldr r0, [r0]
+	ldr r0, [r0]
+
+	/* Set the msp back to the start of the stack. */
+	msr msp, r0
+	/* Globally enable interrupts. */
+	cpsie i
+	cpsie f
+	dsb
+	isb
+	/* Call SVC to start the first task. */
+	svc 0
+	nop
+	nop
 }
 
 __asm void pendSVHandler( void ) {
+    extern criticalNesting;
+    extern currentTCB;
+    extern taskSwitchContext;
 
+    PRESERVE8
+
+    msr r0, psp /* 将当前任务的堆栈指针（PSP）加载到寄存器r0中 */
+    isb /* 指令同步屏障 */
+
+    ldr r3, =currentTCB /* 将当前tcb的地址存储到r3 */
+    ldr r2, [r3] /* 以r3中的内容为地址，将该地址中的数据传到R2中 */
+
+    stmdb r0!, {r4-r11} /* 保存剩下的寄存器值 */
+    str r0, [r2] /* 将r0寄存器的值（PSP）保存到currentTCB指向的任务控制块中，即将PSP的值保存为任务的堆栈指针，因为tcb中stack在最上面 */
+
+    stmdb sp!, {r3, r14}
+    mov r0, #MAX_SYS_INTERRUPT_PRIORITY  
+    msr basepri, r0
+    dsb
+    isb
+    bl taskSwitchContext
+    mov r0, #0
+    msr basepri, r0
+    ldmia sp!, {r3, r14}
+
+    ldr r1, [r3]
+    ldr r0, [r1]
+    ldmia r0!, {r4-r11}
+    msr psp, r0
+    isb
+    bx r14
+    nop
 }

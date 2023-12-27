@@ -21,9 +21,14 @@ typedef struct taskControlBlock {
 /* 重新定义一个tcb变量，供编程使用 */
 typedef TCB TCB_t;
 
+static volatile Base_t schedulerRunning = wFALSE;
+static volatile uint32_t tickCount      = 0U;
+
 
 TCB_t * taskArrayForTest[3];
 uint16_t taskNum = 0;
+TCB_t * volatile currentTCB = NULL;
+uint16_t currentTaskIndex =0;
 
 
 
@@ -164,3 +169,33 @@ Base_t getSchedulerState( void ) {
     rlt = wTRUE;
     return rlt;
 }
+
+void taskSwitchContext( void ) {
+    // 将curTcb指向下一个就绪的任务控制块
+    willingAssert( taskNum > 0 );
+
+    // todo: 以下操作会导致第一次启动的时候任务从第二个任务启动
+    currentTaskIndex++;
+    if ( currentTaskIndex >= taskNum ) { // 环状
+        currentTaskIndex = 0;
+    }
+
+    currentTCB = taskArrayForTest[currentTaskIndex];
+}
+
+void OSStart(void) {
+    DISABLE_INTERRUPTS();
+    schedulerRunning = wTRUE;
+    tickCount = 0U;
+
+    if (startScheduler() != wFALSE) {
+
+    } else {
+
+    }
+}
+
+void OSStop(void) {
+
+}
+

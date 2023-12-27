@@ -12,5 +12,8 @@ typedef void * TaskHandle_t;
 
 Base_t sysTickService( void );
 Base_t getSchedulerState( void );
+void taskSwitchContext( void );
+void OSStart(void);
+void OSStop(void);
 
 #endif

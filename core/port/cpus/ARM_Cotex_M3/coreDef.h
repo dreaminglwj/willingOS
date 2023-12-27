@@ -6,6 +6,98 @@ extern "c" {
 #endif
 
 
+
+#ifdef __cplusplus
+  #define     __I     volatile                /**/ defines 'read only' permissions      */
+#else
+  #define     __I     volatile const          /* defines 'read only' permissions      */
+#endif
+#define     __O     volatile                  /* defines 'write only' permissions     */
+#define     __IO    volatile                  /* defines 'read / write' permissions   */
+
+/******************************************************************
+            中断相关配置                                                
+******************************************************************/
+#ifndef __CORTEX_M3_INTERRUPT_PRIORITY_BITS 
+    #define __CORTEX_M3_INTERRUPT_PRIORITY_BITS 8
+#endif
+
+#ifndef __NVIC_PRIORITY_BITS
+    #define __NVIC_PRIORITY_BITS 4 /* nvic优先级标准定义 */
+#endif
+
+
+/******************************************************************
+            systick相关配置                                                 
+******************************************************************/
+/* cortex-m3地址映射关系 */
+#define SYS_CTRL_BASE       (0xE000E000) /* system ctrl space base address */
+#define ITM_BASE            (0xE0000000)                              /* ITM:指令跟踪单元                   */
+
+#define SYS_TICK_BASE       (SYS_CTRL_BASE + 0X10) /* 系统节拍控制基地址 */
+
+
+typedef struct
+{
+  __IO uint32_t CtrlReg;                         
+  __IO uint32_t ReloadReg;                         
+  __IO uint32_t CurValueReg;                          
+  __I  uint32_t SysTickCalibrationReg;                       
+} SysTick_t;
+
+#define SysTick (*(SysTick_t) SYS_TICK_BASE) /* sysTick寄存器组指针 */
+
+
+#define SysTick_CTRL_COUNTFLAG_Pos         16                                             /*!< SysTick CTRL: COUNTFLAG Position */
+#define SysTick_CTRL_COUNTFLAG_Mask         (1ul << SysTick_CTRL_COUNTFLAG_Pos)            /*!< SysTick CTRL: COUNTFLAG Mask */
+
+#define SysTick_CTRL_CLKSOURCE_Pos          2                                             /*!< SysTick CTRL: CLKSOURCE Position */
+#define SysTick_CTRL_CLKSOURCE_Mask         (1ul << SysTick_CTRL_CLKSOURCE_Pos)            /*!< SysTick CTRL: CLKSOURCE Mask */
+
+#define SysTick_CTRL_TICK_INTERRUPT_Pos     1                                             /*!< SysTick CTRL: TICKINT Position */
+#define SysTick_CTRL_TICK_INTERRUPT_Mask    (1ul << SysTick_CTRL_INTERRUPT_Pos)              /*!< SysTick CTRL: TICKINT Mask */
+
+#define SysTick_CTRL_ENABLE_Pos             0                                             /*!< SysTick CTRL: ENABLE Position */
+#define SysTick_CTRL_ENABLE_Mask            (1ul << SysTick_CTRL_ENABLE_Pos)               /*!< SysTick CTRL: ENABLE Mask */
+
+/* SysTick Reload Register Definitions */
+#define SysTick_RELOAD_RELOAD_Pos             0                                             /*!< SysTick LOAD: RELOAD Position */
+#define SysTick_RELOAD_RELOAD_Mask            (0xFFFFFFul << SysTick_RELOAD_RELOAD_Pos)        /*!< SysTick LOAD: RELOAD Mask */
+
+/* SysTick Current Register Definitions */
+#define SysTick_CUR_VALUE_Pos                 0                                             /*!< SysTick VAL: CURRENT Position */
+#define SysTick_CUR_VALUE_Mask                (0xFFFFFFul << SysTick_CUR_VALUE_Pos)        /*!< SysTick VAL: CURRENT Mask */
+
+/* SysTick Calibration Register Definitions */
+#define SysTick_CALIBRATION_NOREF_Pos            31                                             /*!< SysTick CALIB: NOREF Position */
+#define SysTick_CALIBRATION_NOREF_Mask            (1ul << SysTick_CALIBRATION_NOREF_Pos)               /*!< SysTick CALIB: NOREF Mask */
+
+#define SysTick_CALIBRATION_SKEW_Pos             30                                             /*!< SysTick CALIB: SKEW Position */
+#define SysTick_CALIBRATION_SKEW_Mask             (1ul << SysTick_CALIBRATION_SKEW_Pos)                /*!< SysTick CALIB: SKEW Mask */
+
+#define SysTick_CALIBRATION_TENMS_Pos             0                                             /*!< SysTick CALIB: TENMS Position */
+#define SysTick_CALIBRATION_TENMS_Mask            (0xFFFFFFul << SysTick_CUR_VALUE_Pos)        /*!< SysTick CALIB: TENMS Mask */
+
+
+
+
+
+/******************************************************************
+            时钟相关配置                                               
+******************************************************************/
+
+#define SYSCLK_FREQUENCE_72MHz  72000000
+
+#ifdef SYSCLK_FREQUENCE_72MHz
+    uint32_t SysClockFrequence = SYSCLK_FREQUENCE_72MHz;
+#endif
+
+// #define  CPU_REG_NVIC_NVIC           (*((CPU_REG32 *)(0xE000E004)))             /* Int Ctrl'er Type Reg.                */
+// #define  CPU_REG_NVIC_ST_CTRL        (*((CPU_REG32 *)(0xE000E010)))             /* SysTick Ctrl & Status Reg.           */
+// #define  CPU_REG_NVIC_ST_RELOAD      (*((CPU_REG32 *)(0xE000E014)))             /* SysTick Reload      Value Reg.       */
+// #define  CPU_REG_NVIC_ST_CURRENT     (*((CPU_REG32 *)(0xE000E018)))             /* SysTick Current     Value Reg.       */
+// #define  CPU_REG_NVIC_ST_CAL         (*((CPU_REG32 *)(0xE000E01C)))             /* SysTick Calibration Value Reg.       */
+
 /* 基础类型定义 */
 #define willingCHAR		char  /* wl: willing */
 #define willingFLOAT	float
@@ -29,8 +121,61 @@ typedef unsigned long UBase_t;
 
 #define STACK_GROWTH STACK_GROWTH_DOWN
 
+
+
 /* 任务相关 */
 typedef void (*TaskFunc_t)(void *);
+
+static UBase_t criticalNesting = 0xaaaaaaaa;
+
+/*
+    系统控制块（scb:system control block）的内存映射结构
+*/
+typedef struct
+{
+  __I  uint32_t CPUID;                        /*!< Offset: 0x00  CPU ID Base Register                                  */
+  __IO uint32_t ICSR;                         /*!< Offset: 0x04  Interrupt Control State Register                      */
+  __IO uint32_t VTOR;                         /*!< Offset: 0x08  Vector Table Offset Register                          */
+  __IO uint32_t AIRCR;                        /*!< Offset: 0x0C  Application Interrupt / Reset Control Register        */
+  __IO uint32_t SCR;                          /*!< Offset: 0x10  System Control Register                               */
+  __IO uint32_t CCR;                          /*!< Offset: 0x14  Configuration Control Register                        */
+  __IO uint8_t  SHP[12];                      /*!< Offset: 0x18  System Handlers Priority Registers (4-7, 8-11, 12-15) */
+  __IO uint32_t SHCSR;                        /*!< Offset: 0x24  System Handler Control and State Register             */
+  __IO uint32_t CFSR;                         /*!< Offset: 0x28  Configurable Fault Status Register                    */
+  __IO uint32_t HFSR;                         /*!< Offset: 0x2C  Hard Fault Status Register                            */
+  __IO uint32_t DFSR;                         /*!< Offset: 0x30  Debug Fault Status Register                           */
+  __IO uint32_t MMFAR;                        /*!< Offset: 0x34  Mem Manage Address Register                           */
+  __IO uint32_t BFAR;                         /*!< Offset: 0x38  Bus Fault Address Register                            */
+  __IO uint32_t AFSR;                         /*!< Offset: 0x3C  Auxiliary Fault Status Register                       */
+  __I  uint32_t PFR[2];                       /*!< Offset: 0x40  Processor Feature Register                            */
+  __I  uint32_t DFR;                          /*!< Offset: 0x48  Debug Feature Register                                */
+  __I  uint32_t ADR;                          /*!< Offset: 0x4C  Auxiliary Feature Register                            */
+  __I  uint32_t MMFR[4];                      /*!< Offset: 0x50  Memory Model Feature Register                         */
+  __I  uint32_t ISAR[5];                      /*!< Offset: 0x60  ISA Feature Register                                  */
+} SysCtrlBlock_t;  
+
+
+#define NVIC_PriorityGroup_0         ((uint32_t)0x700) /*!< 0 bits for pre-emption priority
+                                                            4 bits for subpriority */
+#define NVIC_PriorityGroup_1         ((uint32_t)0x600) /*!< 1 bits for pre-emption priority
+                                                            3 bits for subpriority */
+#define NVIC_PriorityGroup_2         ((uint32_t)0x500) /*!< 2 bits for pre-emption priority
+                                                            2 bits for subpriority */
+#define NVIC_PriorityGroup_3         ((uint32_t)0x400) /*!< 3 bits for pre-emption priority
+                                                            1 bits for subpriority */
+#define NVIC_PriorityGroup_4         ((uint32_t)0x300) /*!< 4 bits for pre-emption priority
+                                                            0 bits for subpriority */
+
+#define IS_NVIC_PRIORITY_GROUP(GROUP) (((GROUP) == NVIC_PriorityGroup_0) || \
+                                       ((GROUP) == NVIC_PriorityGroup_1) || \
+                                       ((GROUP) == NVIC_PriorityGroup_2) || \
+                                       ((GROUP) == NVIC_PriorityGroup_3) || \
+                                       ((GROUP) == NVIC_PriorityGroup_4))
+
+#define AIRCR_VECTKEY_MASK    ((uint32_t)0x05FA0000)
+
+#define SYS_CTRL_BLOCK_BASE (SYS_CTRL_BASE + 0x0D00)
+#define SysCtrlBlock ((SysCtrlBlock_t *) SYS_CTRL_BLOCK_BASE )
 
 
 /* scheduler 相关定义 */
@@ -66,6 +211,15 @@ static willingFORCE_INLINE void clearBasePriorityFromISR( void ) {
     }
 }
 
+
+/* 临界区相关定义 */
+#define DISABLE_INTERRUPTS ( __asm volatile ("cpsid i"); )
+#define ENABLE_INTERRUPTS ( __asm volatile ("cpsie i"); )
+
+
+/* 断言 */
+#define assrtFunc(char,int) printf("Error:%s,%d\r\n",char,int)
+#define willingAssert(x) if((x)==0) assrtFunc(__FILE__,__LINE__)
 
 #ifdef __cplusplus
 }
