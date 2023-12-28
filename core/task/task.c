@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "coreDef.h"
@@ -36,7 +36,9 @@ static void initTask( TaskFunc_t taskFunc,
                             const char * const taskName,
                             const uint32_t stackSize,
                             void * const params,
-                            UBase_t priority);
+                            UBase_t priority,
+														TCB_t * tcb,
+														TaskHandle_t * const taskHandler);
 
 
 /* 用于测试任务调度，暂时未加临界区，当三个任务都加入到数组后开启调度器 */
@@ -57,7 +59,8 @@ Long_t createTask( TaskFunc_t taskFunc, /* 任务函数 */
     堆栈向下增长（逆向生长，80x86和cotex-M3）：从高地址(0xFF)向低地址（0x00）增长 */
     /* 如果栈向下生长，先给stack分配空间再给tcb分配空间，防止栈增长覆盖tcb内存；
     如果栈向上生长，先给tcb分配空间，再给stack分配空间 */
-    #if(STACK_GROWTH == STACK_GROWTH_DOWN) {
+    #if(STACK_GROWTH == STACK_GROWTH_DOWN) 
+		{
         Stack_t *stack;
         
         stack = ( Stack_t *  ) willingMalloc( ( (size_t) stackSize ) * sizeof(Stack_t) );
@@ -72,13 +75,14 @@ Long_t createTask( TaskFunc_t taskFunc, /* 任务函数 */
             }
         } 
     } 
-    #else { /* STACK_GROWTH */
+    #else 
+		{ /* STACK_GROWTH */
 
     }
     #endif /* STACK_GROWTH */
 
     if ( tcb != NULL  ) {
-        initTask(taskFunc, taskName, stackSize, params, priority, taskHandler);
+        initTask(taskFunc, taskName, stackSize, params, priority, tcb, taskHandler);
         addTaskToReadyArray(tcb);
         rlt = wPASS;
     } else {
@@ -93,18 +97,20 @@ static void initTask( TaskFunc_t taskFunc,
                             const uint32_t stackSize,
                             void * const params,
                             UBase_t priority,
-                            TaskHandle_t * const taskHandler,
-                            TCB_t * tcb ) {
+														TCB_t * tcb,
+														TaskHandle_t * const taskHandler) {
     Stack_t * topOfStack = NULL;
     UBase_t i = 0;
 
-    #if( STACK_GROWTH == STACK_GROWTH_DOWN ) {
+    #if( STACK_GROWTH == STACK_GROWTH_DOWN ) 
+		{
         topOfStack = tcb->stack + ( stackSize - ( uint32_t ) 1 );
         topOfStack = ( Stack_t * ) ( ( ( willingPOINTER_SIZE_TYPE ) topOfStack ) & ( ~( ( willingPOINTER_SIZE_TYPE ) BYTE_ALIGNMENT_MASK ) ) );
 
         // 检查溢出
     }
-    #else {  /* STACK_GROWTH */
+    #else 
+		{  /* STACK_GROWTH */
 
     }
     #endif /* STACK_GROWTH */
@@ -128,7 +134,7 @@ static void initTask( TaskFunc_t taskFunc,
         tcb->priority = priority;
     }
 
-    tcb->topOfStack = initStack( topOfStack, taskFunc, params );
+    tcb->stackTop = initStack( topOfStack, taskFunc, params );
 
     if ( ( void * ) taskHandler != NULL ) {
         *taskHandler = ( TaskHandle_t ) tcb;
@@ -142,10 +148,10 @@ static void initTask( TaskFunc_t taskFunc,
 /* 用于测试任务调度，暂时未加临界区，当三个任务都加入到数组后开启调度器 */
 static void addTaskToReadyArray( TCB_t * tcb ) {
     if ( taskNum > 2 ) {
-        return
+        return;
     }
 
-    taskArrayForTest[taskNum++] = tcb
+    taskArrayForTest[taskNum++] = tcb;
 }
 
 /*  
@@ -157,7 +163,7 @@ Base_t sysTickService( void ) {
     // 暂时默认需要切换
     needSwitchCtx = wTRUE;
 
-    return needSwitchCtx
+    return needSwitchCtx;
 }
 
 
@@ -188,7 +194,7 @@ void OSStart(void) {
     schedulerRunning = wTRUE;
     tickCount = 0U;
 
-    if (startScheduler() != wFALSE) {
+    if ( startWillingScheduler() != wFALSE ) {
 
     } else {
 

@@ -1,0 +1,55 @@
+Dependencies for Project 'willingOS', Target 'willingOS': (DO NOT MODIFY !)
+F (.\core\task\task.c)(0x658D6749)(--c99 --gnu -c --cpu Cortex-M3 -D__EVAL --li -g -O0 --apcs=interwork --split_sections -I .\core -I .\include -I .\user -I .\core\port\cpus\ARM_Cotex_M3 -I D:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\CMSIS\Include -I .\core\sys -I .\core\cpu\ARM-Cortex-M3-I.\RTE\_willingOS-ID:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\Device\ARM\ARMCM3\Include-ID:\KEIL_5\ARM\CMSIS\Include-D__UVISION_VERSION="528" -DARMCM3-o .\objects\task.o --omf_browse .\objects\task.crf --depend .\objects\task.d)
+I (D:\KEIL_5\ARM\ARMCC\include\stdint.h)(0x5CEB79E2)
+I (D:\KEIL_5\ARM\ARMCC\include\string.h)(0x5CEB79E2)
+I (.\core\port\cpus\ARM_Cotex_M3\coreDef.h)(0x658D6BF9)
+I (.\include\willingOSConfig.h)(0x658D5CEF)
+I (D:\KEIL_5\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
+I (.\include\task.h)(0x658D5D83)
+I (.\include\willing.h)(0x658D5D5A)
+I (D:\KEIL_5\ARM\ARMCC\include\stdlib.h)(0x5CEB79E2)
+I (.\include\memory.h)(0x658D5D5E)
+I (.\include\protable.h)(0x658D6714)
+F (.\core\sys\systick.c)(0x658D62BF)(--c99 --gnu -c --cpu Cortex-M3 -D__EVAL --li -g -O0 --apcs=interwork --split_sections -I .\core -I .\include -I .\user -I .\core\port\cpus\ARM_Cotex_M3 -I D:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\CMSIS\Include -I .\core\sys -I .\core\cpu\ARM-Cortex-M3-I.\RTE\_willingOS-ID:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\Device\ARM\ARMCM3\Include-ID:\KEIL_5\ARM\CMSIS\Include-D__UVISION_VERSION="528" -DARMCM3-o .\objects\systick.o --omf_browse .\objects\systick.crf --depend .\objects\systick.d)
+I (core\sys\sysTick.h)(0x658D605F)
+I (D:\KEIL_5\ARM\ARMCC\include\stdint.h)(0x5CEB79E2)
+I (.\core\cpu\ARM-Cortex-M3\cpu.h)(0x658D5D8F)
+I (D:\KEIL_5\ARM\ARMCC\include\stdlib.h)(0x5CEB79E2)
+I (.\include\willingOSConfig.h)(0x658D5CEF)
+I (.\core\port\cpus\ARM_Cotex_M3\coreDef.h)(0x658D6BF9)
+I (D:\KEIL_5\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
+F (.\core\sys\sysTick.h)(0x658D605F)()
+F (.\core\sys\willingOS.c)(0x658D64F2)(--c99 --gnu -c --cpu Cortex-M3 -D__EVAL --li -g -O0 --apcs=interwork --split_sections -I .\core -I .\include -I .\user -I .\core\port\cpus\ARM_Cotex_M3 -I D:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\CMSIS\Include -I .\core\sys -I .\core\cpu\ARM-Cortex-M3-I.\RTE\_willingOS-ID:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\Device\ARM\ARMCM3\Include-ID:\KEIL_5\ARM\CMSIS\Include-D__UVISION_VERSION="528" -DARMCM3-o .\objects\willingos.o --omf_browse .\objects\willingos.crf --depend .\objects\willingos.d)
+I (D:\KEIL_5\ARM\ARMCC\include\stdint.h)(0x5CEB79E2)
+I (core\sys\willingOS.h)(0x658D5CF8)
+I (.\core\port\cpus\ARM_Cotex_M3\coreDef.h)(0x658D6BF9)
+I (.\include\willingOSConfig.h)(0x658D5CEF)
+I (D:\KEIL_5\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
+I (core\sys\sysTick.h)(0x658D605F)
+I (.\include\task.h)(0x658D5D83)
+F (.\core\sys\willingOS.h)(0x658D5CF8)()
+F (.\core\cpu\ARM-Cortex-M3\cpu.h)(0x658D5D8F)()
+F (.\include\memory.h)(0x658D5D5E)()
+F (.\include\protable.h)(0x658D6714)()
+F (.\include\task.h)(0x658D5D83)()
+F (.\include\willing.h)(0x658D5D5A)()
+F (.\include\WillingOSConfig.h)(0x658D5CEF)()
+F (.\user\main.c)(0x658D6302)(--c99 --gnu -c --cpu Cortex-M3 -D__EVAL --li -g -O0 --apcs=interwork --split_sections -I .\core -I .\include -I .\user -I .\core\port\cpus\ARM_Cotex_M3 -I D:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\CMSIS\Include -I .\core\sys -I .\core\cpu\ARM-Cortex-M3-I.\RTE\_willingOS-ID:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\Device\ARM\ARMCM3\Include-ID:\KEIL_5\ARM\CMSIS\Include-D__UVISION_VERSION="528" -DARMCM3-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
+I (.\core\sys\sysTick.h)(0x658D605F)
+I (D:\KEIL_5\ARM\ARMCC\include\stdint.h)(0x5CEB79E2)
+I (.\core\sys\willingOS.h)(0x658D5CF8)
+I (.\core\port\cpus\ARM_Cotex_M3\coreDef.h)(0x658D6BF9)
+I (.\include\willingOSConfig.h)(0x658D5CEF)
+I (D:\KEIL_5\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
+I (.\include\task.h)(0x658D5D83)
+F (.\core\port\cpus\ARM_Cotex_M3\coreDef.h)(0x658D6BF9)()
+F (.\core\port\cpus\ARM_Cotex_M3\port.c)(0x658D6D24)(--c99 --gnu -c --cpu Cortex-M3 -D__EVAL --li -g -O0 --apcs=interwork --split_sections -I .\core -I .\include -I .\user -I .\core\port\cpus\ARM_Cotex_M3 -I D:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\CMSIS\Include -I .\core\sys -I .\core\cpu\ARM-Cortex-M3-I.\RTE\_willingOS-ID:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\Device\ARM\ARMCM3\Include-ID:\KEIL_5\ARM\CMSIS\Include-D__UVISION_VERSION="528" -DARMCM3-o .\objects\port.o --omf_browse .\objects\port.crf --depend .\objects\port.d)
+I (D:\KEIL_5\ARM\ARMCC\include\stdint.h)(0x5CEB79E2)
+I (core\port\cpus\ARM_Cotex_M3\coreDef.h)(0x658D6BF9)
+I (.\include\willingOSConfig.h)(0x658D5CEF)
+I (D:\KEIL_5\ARM\ARMCC\include\stdio.h)(0x5CEB79E2)
+I (.\include\task.h)(0x658D5D83)
+I (.\include\willing.h)(0x658D5D5A)
+I (D:\KEIL_5\ARM\ARMCC\include\stdlib.h)(0x5CEB79E2)
+F (.\core\port\memory\memory.c)(0x658D4CD2)(--c99 --gnu -c --cpu Cortex-M3 -D__EVAL --li -g -O0 --apcs=interwork --split_sections -I .\core -I .\include -I .\user -I .\core\port\cpus\ARM_Cotex_M3 -I D:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\CMSIS\Include -I .\core\sys -I .\core\cpu\ARM-Cortex-M3-I.\RTE\_willingOS-ID:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\Device\ARM\ARMCM3\Include-ID:\KEIL_5\ARM\CMSIS\Include-D__UVISION_VERSION="528" -DARMCM3-o .\objects\memory.o --omf_browse .\objects\memory.crf --depend .\objects\memory.d)
+I (D:\KEIL_5\ARM\ARMCC\include\stdlib.h)(0x5CEB79E2)

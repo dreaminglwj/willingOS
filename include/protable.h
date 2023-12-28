@@ -8,5 +8,6 @@
 #endif
 
 Stack_t *initStack( Stack_t *topOfStack, TaskFunc_t pxCode, void *pvParameters );
+Base_t startWillingScheduler( void );
 
 #endif 

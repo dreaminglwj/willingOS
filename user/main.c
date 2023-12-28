@@ -6,8 +6,28 @@
 #define PERIPH_BASE           ((uint32_t)0x40000000) /*!< Peripheral base address in the alias region */
 #define APB2PERIPH_BASE       (PERIPH_BASE + 0x10000)
 #define GPIOA_BASE            (APB2PERIPH_BASE + 0x0800)
+#define GPIOB_BASE            (APB2PERIPH_BASE + 0x0C00)
+#define GPIOC_BASE            (APB2PERIPH_BASE + 0x1000)
+#define GPIOD_BASE            (APB2PERIPH_BASE + 0x1400)
+#define GPIOE_BASE            (APB2PERIPH_BASE + 0x1800)
+#define GPIOF_BASE            (APB2PERIPH_BASE + 0x1C00)
+#define GPIOG_BASE            (APB2PERIPH_BASE + 0x2000)
 
 #define GPIOA_ODR_Addr    (GPIOA_BASE+12) //0x4001080C 
+#define GPIOB_ODR_Addr    (GPIOB_BASE+12) //0x40010C0C 
+#define GPIOC_ODR_Addr    (GPIOC_BASE+12) //0x4001100C 
+#define GPIOD_ODR_Addr    (GPIOD_BASE+12) //0x4001140C 
+#define GPIOE_ODR_Addr    (GPIOE_BASE+12) //0x4001180C 
+#define GPIOF_ODR_Addr    (GPIOF_BASE+12) //0x40011A0C    
+#define GPIOG_ODR_Addr    (GPIOG_BASE+12) //0x40011E0C    
+
+#define GPIOA_IDR_Addr    (GPIOA_BASE+8) //0x40010808 
+#define GPIOB_IDR_Addr    (GPIOB_BASE+8) //0x40010C08 
+#define GPIOC_IDR_Addr    (GPIOC_BASE+8) //0x40011008 
+#define GPIOD_IDR_Addr    (GPIOD_BASE+8) //0x40011408 
+#define GPIOE_IDR_Addr    (GPIOE_BASE+8) //0x40011808 
+#define GPIOF_IDR_Addr    (GPIOF_BASE+8) //0x40011A08 
+#define GPIOG_IDR_Addr    (GPIOG_BASE+8) //0x40011E08 
 
 #define BITBAND(addr, bitnum) ((addr & 0xF0000000)+0x2000000+((addr &0xFFFFF)<<5)+(bitnum<<2)) 
 #define MEM_ADDR(addr)  *((volatile unsigned long  *)(addr)) 
@@ -41,7 +61,7 @@ TaskHandle_t lightLed1Handler;
 TaskHandle_t lightLed2Handler;
 TaskHandle_t shutLedsHandler;
 
-oid lightLed1( void *param ) {
+void lightLed1( void *param ) {
     while (1)
     {
        LED1 = 1;

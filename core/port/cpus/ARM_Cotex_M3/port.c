@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <stdint.h>
 #include "coreDef.h"
 #include "task.h"
 #include "willing.h"
@@ -17,6 +17,13 @@
 #define NVIC_SYSTICK_CLK_BIT	   ( 1UL << 2UL )
 #define NVIC_SYSTICK_INT_BIT       ( 1UL << 1UL )
 #define NVIC_SYSTICK_ENABLE_BIT	   ( 1UL << 0UL )
+
+static void taskExitError( void )
+{
+	// configASSERT( uxCriticalNesting == ~0UL );
+	// portDISABLE_INTERRUPTS();
+	for( ;; );
+}
 
 Stack_t *initStack( Stack_t *topOfStack, TaskFunc_t taskFunc, void *params )
 {
@@ -47,12 +54,7 @@ __asm void clearInterruptMaskFromISR( uint32_t mask ) {
     bx lr
 }
 
-static void taskExitError( void )
-{
-	// configASSERT( uxCriticalNesting == ~0UL );
-	// portDISABLE_INTERRUPTS();
-	for( ;; );
-}
+
 
 /*  检查等待列表，将延时时间到的任务移到就绪表，并判断就绪表是否有超过1个任务，如果超过1个，则调度
 */
@@ -118,7 +120,7 @@ void setupTimerInterrupt( void ) {
 
 static void startFirstTask( void );
 
-Base_t startScheduler( void ) {
+Base_t startWillingScheduler( void ) {
     Base_t rlt = 0;
 
     /* 将PendSV和systick中断优先级设置为最低 */
@@ -134,7 +136,7 @@ Base_t startScheduler( void ) {
     return rlt;
 }
 
-void stopScheduler( void ) {
+void stopWillingScheduler( void ) {
     willingAssert(criticalNesting==1000UL);
 }
 
@@ -172,7 +174,8 @@ __asm void SVCHandler( void ) {
 	bx r14
 }
 
-__asm startFirstTask( void ) {
+
+__asm void startFirstTask( void ) {
 	PRESERVE8
 
 	/* Use the NVIC offset register to locate the stack. */
@@ -200,7 +203,7 @@ __asm void pendSVHandler( void ) {
 
     PRESERVE8
 
-    msr r0, psp /* 将当前任务的堆栈指针（PSP）加载到寄存器r0中 */
+    mrs r0, psp /* 将当前任务的堆栈指针（PSP）加载到寄存器r0中 */
     isb /* 指令同步屏障 */
 
     ldr r3, =currentTCB /* 将当前tcb的地址存储到r3 */

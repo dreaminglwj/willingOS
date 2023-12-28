@@ -5,6 +5,10 @@
 extern "c" {
 #endif
 
+#include <stdint.h>
+#include "willingOSConfig.h"
+#include "stdio.h"
+
 
 
 #ifdef __cplusplus
@@ -14,6 +18,25 @@ extern "c" {
 #endif
 #define     __O     volatile                  /* defines 'write only' permissions     */
 #define     __IO    volatile                  /* defines 'read / write' permissions   */
+
+
+#if defined ( __CC_ARM   )
+  #define __ASM            __asm                                      /*!< asm keyword for ARM Compiler          */
+  #define __INLINE         __inline                                   /*!< inline keyword for ARM Compiler       */
+
+#elif defined ( __ICCARM__ )
+  #define __ASM           __asm                                       /*!< asm keyword for IAR Compiler          */
+  #define __INLINE        inline                                      /*!< inline keyword for IAR Compiler. Only avaiable in High optimization mode! */
+
+#elif defined   (  __GNUC__  )
+  #define __ASM            __asm                                      /*!< asm keyword for GNU Compiler          */
+  #define __INLINE         inline                                     /*!< inline keyword for GNU Compiler       */
+
+#elif defined   (  __TASKING__  )
+  #define __ASM            __asm                                      /*!< asm keyword for TASKING Compiler      */
+  #define __INLINE         inline                                     /*!< inline keyword for TASKING Compiler   */
+
+#endif
 
 /******************************************************************
             中断相关配置                                                
@@ -56,7 +79,7 @@ typedef struct
   __I  uint32_t SysTickCalibrationReg;                       
 } SysTick_t;
 
-#define SysTick (*(SysTick_t) SYS_TICK_BASE) /* sysTick寄存器组指针 */
+#define SysTick ((SysTick_t*) SYS_TICK_BASE) /* sysTick寄存器组指针 */
 
 
 #define SysTick_CTRL_COUNTFLAG_Pos         16                                             /*!< SysTick CTRL: COUNTFLAG Position */
@@ -66,7 +89,7 @@ typedef struct
 #define SysTick_CTRL_CLKSOURCE_Mask         (1ul << SysTick_CTRL_CLKSOURCE_Pos)            /*!< SysTick CTRL: CLKSOURCE Mask */
 
 #define SysTick_CTRL_TICK_INTERRUPT_Pos     1                                             /*!< SysTick CTRL: TICKINT Position */
-#define SysTick_CTRL_TICK_INTERRUPT_Mask    (1ul << SysTick_CTRL_INTERRUPT_Pos)              /*!< SysTick CTRL: TICKINT Mask */
+#define SysTick_CTRL_TICK_INTERRUPT_Mask    (1ul << SysTick_CTRL_TICK_INTERRUPT_Pos)              /*!< SysTick CTRL: TICKINT Mask */
 
 #define SysTick_CTRL_ENABLE_Pos             0                                             /*!< SysTick CTRL: ENABLE Position */
 #define SysTick_CTRL_ENABLE_Mask            (1ul << SysTick_CTRL_ENABLE_Pos)               /*!< SysTick CTRL: ENABLE Mask */
@@ -195,7 +218,7 @@ typedef struct
 
 
 /* 函数 */
-#define willingINLINE __inline
+#define willingINLINE __INLINE
 
 #ifndef willingFORCE_INLINE 
    #define willingFORCE_INLINE __forceinline
@@ -211,7 +234,7 @@ extern void exitCriticalSection( void );
 #define CLEAR_INTERRUPT_MASK_FROM_ISR(x)  clearInterruptMaskFromISR( x )
 
 static willingFORCE_INLINE void maximizeBasePriority( void ) {
-    uint32_t maxPriority = MAX_SYS_INTERRUPT_PRIORITY
+    uint32_t maxPriority = MAX_SYS_INTERRUPT_PRIORITY;
     __asm{
         msr basepri, maxPriority  /* msr：将普通寄存器的值写入到特殊寄存器 */
         dsb /* 数据同步屏障，通过对指令流水的管理，确保dsb之前的所有显式数据内存传输指令都已经再内存中读取或写入完成，同时确保任何后续的指令都将再dsb执行之后开始执行 */
@@ -227,8 +250,14 @@ static willingFORCE_INLINE void clearBasePriorityFromISR( void ) {
 
 
 /* 临界区相关定义 */
-#define DISABLE_INTERRUPTS ( __asm volatile ("cpsid i"); )
-#define ENABLE_INTERRUPTS ( __asm volatile ("cpsie i"); )
+//static willingINLINE void __enable_irq()               { __ASM volatile ("cpsie i"); }
+//static willingINLINE void __disable_irq()              { __ASM volatile ("cpsid i"); }
+
+//#define DISABLE_INTERRUPTS __disable_irq()
+//#define ENABLE_INTERRUPTS __enable_irq() 
+
+#define DISABLE_INTERRUPTS()				maximizeBasePriority()
+#define ENABLE_INTERRUPTS()					clearBasePriorityFromISR()
 
 #define ENTER_CRITICAL_SECTION() enterCriticalSection()
 #define EXIT_CRITICAL_SECTION()  exitCriticalSection()
