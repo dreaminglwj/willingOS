@@ -9,6 +9,15 @@
 /* ICSR寄存器中除了VECTACTIVE位之外的其他所有位的掩码 */
 #define ICSR_NONE_VECTOR_ACTIVE_MASK ( 0xFFUL )
 
+#define NVIC_PENDSV_PRI					( ( ( uint32_t ) KERNEL_INTERRUPT_PRIORITY ) << 16UL )
+#define NVIC_SYSTICK_PRI				( ( ( uint32_t ) KERNEL_INTERRUPT_PRIORITY ) << 24UL )
+
+#define NVIC_SYS_PRI2_REG               ( * ( ( volatile uint32_t * ) 0xE000ED20 ) )
+
+#define NVIC_SYSTICK_CLK_BIT	   ( 1UL << 2UL )
+#define NVIC_SYSTICK_INT_BIT       ( 1UL << 1UL )
+#define NVIC_SYSTICK_ENABLE_BIT	   ( 1UL << 0UL )
+
 Stack_t *initStack( Stack_t *topOfStack, TaskFunc_t taskFunc, void *params )
 {
 
@@ -77,8 +86,50 @@ void SysTick_Handler( void ) {
     }
 }
 
+/*
+    确定一个最高ISR优先级，在这个ISR或者更低优先级的ISR中可以安全的调用以FromISR结尾的API函数
+*/
+void ensureHighestISRPriority( void ) {
+//     volatile uint32_t priorityBackup;
+//     volatile uint8_t * const firstUserPriorityReg = ( uint8_t * ) ( NVIC_IP_REGISTERS_OFFSET_16 + FIRST_USER_INTERRUPT_NUMBER );
+//     volatile uint8_t maxPriority;
+
+//     /* 保存中断优先级值，以便覆写PRI_0寄存器值 */
+//     priorityBackup = *firstUserPriorityReg;
+
+//     /* 
+//         确定有效的优先级位数
+//         首先向所有位写1，然后再读出来，由于无效的优先级位读出来为0，所以最后计算以下值为1的位数就知道有多少优先级位数了
+//      */
+//     *firstUserPriorityReg = MAX_8_BIT_VALUE;
+//     maxPriority = *firstUserPriorityReg;
+
+//     /*
+//         冗余代码，用于防止用户错误设置可屏蔽中断优先级值
+//     */
+//    max
+
+}
+
+void setupTimerInterrupt( void ) {
+    SysTick->ReloadReg = ( SYS_TICK_CLOCK_RATE / SYS_TICK_RATE ) - 1UL;
+    SysTick->CtrlReg = ( NVIC_SYSTICK_CLK_BIT | NVIC_SYSTICK_INT_BIT | NVIC_SYSTICK_ENABLE_BIT );
+}
+
+static void startFirstTask( void );
+
 Base_t startScheduler( void ) {
     Base_t rlt = 0;
+
+    /* 将PendSV和systick中断优先级设置为最低 */
+    NVIC_SYS_PRI2_REG |= NVIC_PENDSV_PRI;
+    NVIC_SYS_PRI2_REG |= NVIC_SYSTICK_PRI;
+
+    setupTimerInterrupt();
+
+    criticalNesting = 0;
+
+    startFirstTask();
 
     return rlt;
 }

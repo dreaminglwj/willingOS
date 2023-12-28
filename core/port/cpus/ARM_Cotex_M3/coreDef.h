@@ -27,6 +27,17 @@ extern "c" {
 #endif
 
 
+/* 用于检查中断优先级的变量定义 */
+#define FIRST_USER_INTERRUPT_NUMBER		( 16 )
+#define NVIC_IP_REGISTERS_OFFSET_16 	( 0xE000E3F0 )
+#define AIRCR_REG						( * ( ( volatile uint32_t * ) 0xE000ED0C ) )
+#define MAX_8_BIT_VALUE					( ( uint8_t ) 0xff )
+#define TOP_BIT_OF_BYTE					( ( uint8_t ) 0x80 )
+#define MAX_PRIGROUP_BITS				( ( uint8_t ) 7 )
+#define PRIORITY_GROUP_MASK				( 0x07UL << 8UL )
+#define PRIGROUP_SHIFT					( 8UL )
+
+
 /******************************************************************
             systick相关配置                                                 
 ******************************************************************/
@@ -193,6 +204,9 @@ typedef struct
 extern uint32_t setInterruptMaskFromISR( void );
 extern void clearInterruptMaskFromISR( uint32_t mask );
 
+extern void enterCriticalSection( void );
+extern void exitCriticalSection( void );
+
 #define SET_INTERRUPT_MASK_FROM_ISR setInterruptMaskFromISR()
 #define CLEAR_INTERRUPT_MASK_FROM_ISR(x)  clearInterruptMaskFromISR( x )
 
@@ -215,6 +229,9 @@ static willingFORCE_INLINE void clearBasePriorityFromISR( void ) {
 /* 临界区相关定义 */
 #define DISABLE_INTERRUPTS ( __asm volatile ("cpsid i"); )
 #define ENABLE_INTERRUPTS ( __asm volatile ("cpsie i"); )
+
+#define ENTER_CRITICAL_SECTION() enterCriticalSection()
+#define EXIT_CRITICAL_SECTION()  exitCriticalSection()
 
 
 /* 断言 */

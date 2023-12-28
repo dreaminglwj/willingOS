@@ -4,7 +4,11 @@
 #define MAX_TASK_NAME_LEN (16) 
 #define MAX_PRIORITY_NUM  (32)
 
+/******************************************************************
+            时钟相关定义                                                
+******************************************************************/
 #define SYS_TICK_RATE ((uint32_t) 1000)
+#define SYS_TICK_CLOCK_RATE (SysClockFrequence)
 
 /******************************************************************
             与中断有关的配置选项                                                 
@@ -20,6 +24,8 @@
 
 /* 系统可管理的最高中断优先级 */
 #define MAX_INTERRUPT_PRIORITY_LITERAL 5
+
+#define KERNEL_INTERRUPT_PRIORITY 		( LOWEST_INTERRUPT_PRIORITY_LITERAL << (8 - PRIORITY_BITS) )	/* 240 */
 
 /* 实际使用的优先级 */
 #define MAX_SYS_INTERRUPT_PRIORITY ( MAX_INTERRUPT_PRIORITY_LITERAL << ( __CORTEX_M3_INTERRUPT_PRIORITY_BITS - PRIORITY_BITS ) )
