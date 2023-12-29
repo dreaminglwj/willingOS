@@ -52,7 +52,7 @@
           <OutputName>willingOS</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\Listings\</ListingPath>
@@ -452,6 +452,26 @@
               <FileType>1</FileType>
               <FilePath>.\user\main.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f10x.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\user\stm32f10x.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\user\stm32f10x_conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\user\stm32f10x_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_it.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\user\stm32f10x_it.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -474,6 +494,21 @@
               <FileName>memory.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\core\port\memory\memory.c</FilePath>
+            </File>
+            <File>
+              <FileName>startup_stm32f10x_hd.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\core\port\cpus\ARM_Cotex_M3\startup_stm32f10x_hd.s</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\core\port\cpus\ARM_Cotex_M3\system_stm32f10x.c</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f10x.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\core\port\cpus\ARM_Cotex_M3\system_stm32f10x.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,6 +1,8 @@
 #ifndef TASK_H
 #define TASK_H
 
+#include "coreDef.h"
+
 
 /* 任务句柄，可以用于删除任务 */
 typedef void * TaskHandle_t;

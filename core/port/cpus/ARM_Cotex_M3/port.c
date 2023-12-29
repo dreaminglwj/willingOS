@@ -4,6 +4,10 @@
 #include "willing.h"
 #include "willingOSConfig.h"
 
+#ifdef SYSCLK_FREQUENCE_72MHz
+    uint32_t SysClockFrequence = SYSCLK_FREQUENCE_72MHz;
+#endif
+
 #define INITIAL_XPSR			( 0x01000000 )
 #define START_ADDRESS_MASK		( ( Stack_t ) 0xfffffffeUL )
 /* ICSR寄存器中除了VECTACTIVE位之外的其他所有位的掩码 */
@@ -82,11 +86,11 @@ void sysTickHandler( void ) {
     todo: 考虑将这个函数换个位置
     todo: 将这个函数添加到中断向量表中，以便能够在中断时被正确调用
  */
-void SysTick_Handler( void ) {
-    if ( getSchedulerState() != SCHEDULER_STATE_WAITING ) {
-        sysTickHandler();
-    }
-}
+// void SysTick_Handler( void ) {
+//     if ( getSchedulerState() != SCHEDULER_STATE_WAITING ) {
+//         sysTickHandler();
+//     }
+// }
 
 /*
     确定一个最高ISR优先级，在这个ISR或者更低优先级的ISR中可以安全的调用以FromISR结尾的API函数
@@ -114,8 +118,8 @@ void ensureHighestISRPriority( void ) {
 }
 
 void setupTimerInterrupt( void ) {
-    SysTick->ReloadReg = ( SYS_TICK_CLOCK_RATE / SYS_TICK_RATE ) - 1UL;
-    SysTick->CtrlReg = ( NVIC_SYSTICK_CLK_BIT | NVIC_SYSTICK_INT_BIT | NVIC_SYSTICK_ENABLE_BIT );
+    SysTickCtrl->ReloadReg = ( SYS_TICK_CLOCK_RATE / SYS_TICK_RATE ) - 1UL;
+    SysTickCtrl->CtrlReg = ( NVIC_SYSTICK_CLK_BIT | NVIC_SYSTICK_INT_BIT | NVIC_SYSTICK_ENABLE_BIT );
 }
 
 static void startFirstTask( void );
@@ -172,6 +176,7 @@ __asm void SVCHandler( void ) {
 	msr	basepri, r0
 	orr r14, #0xd
 	bx r14
+	nop
 }
 
 
