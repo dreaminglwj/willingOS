@@ -25,7 +25,7 @@ static volatile Base_t schedulerRunning = wFALSE;
 static volatile uint32_t tickCount      = 0U;
 
 
-TCB_t * taskArrayForTest[3];
+TCB_t * taskArrayForTest[MAX_TASK_NUM];
 uint16_t taskNum = 0;
 TCB_t * volatile currentTCB = NULL;
 uint16_t currentTaskIndex =0;

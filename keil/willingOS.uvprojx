@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\user;.\Libraries\CMSIS;.\Libraries\STM32F10x_StdPeriph_Driver\inc;.\core;.\core\sys;.\include;.\core\port\cpus\ARM_Cotex_M3;.\core\cpu\ARM-Cortex-M3</IncludePath>
+              <IncludePath>..\user;..\Libraries\CMSIS;..\Libraries\STM32F10x_StdPeriph_Driver\inc;..\core;..\core\sys;..\include;..\core\port\cpus\ARM_Cotex_M3;..\core\cpu\ARM-Cortex-M3</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -385,27 +385,17 @@
             <File>
               <FileName>task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\core\task\task.c</FilePath>
+              <FilePath>..\core\task\task.c</FilePath>
             </File>
             <File>
               <FileName>systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\core\sys\systick.c</FilePath>
-            </File>
-            <File>
-              <FileName>sysTick.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\core\sys\sysTick.h</FilePath>
+              <FilePath>..\core\sys\systick.c</FilePath>
             </File>
             <File>
               <FileName>willingOS.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\core\sys\willingOS.c</FilePath>
-            </File>
-            <File>
-              <FileName>willingOS.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\core\sys\willingOS.h</FilePath>
+              <FilePath>..\core\sys\willingOS.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -415,27 +405,27 @@
             <File>
               <FileName>memory.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\include\memory.h</FilePath>
+              <FilePath>..\include\memory.h</FilePath>
             </File>
             <File>
               <FileName>protable.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\include\protable.h</FilePath>
+              <FilePath>..\include\protable.h</FilePath>
             </File>
             <File>
               <FileName>task.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\include\task.h</FilePath>
+              <FilePath>..\include\task.h</FilePath>
             </File>
             <File>
               <FileName>willing.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\include\willing.h</FilePath>
+              <FilePath>..\include\willing.h</FilePath>
             </File>
             <File>
               <FileName>WillingOSConfig.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\include\WillingOSConfig.h</FilePath>
+              <FilePath>..\include\WillingOSConfig.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -445,12 +435,12 @@
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\user\main.c</FilePath>
+              <FilePath>..\user\main.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_it.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\user\stm32f10x_it.c</FilePath>
+              <FilePath>..\user\stm32f10x_it.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -461,19 +451,14 @@
           <GroupName>port</GroupName>
           <Files>
             <File>
-              <FileName>coreDef.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\core\port\cpus\ARM_Cotex_M3\coreDef.h</FilePath>
-            </File>
-            <File>
               <FileName>port.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\core\port\cpus\ARM_Cotex_M3\port.c</FilePath>
+              <FilePath>..\core\port\cpus\ARM_Cotex_M3\port.c</FilePath>
             </File>
             <File>
               <FileName>memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\core\port\memory\memory.c</FilePath>
+              <FilePath>..\core\port\memory\memory.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -483,12 +468,12 @@
             <File>
               <FileName>stm32f10x_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Libraries\STM32F10x_StdPeriph_Driver\src\stm32f10x_gpio.c</FilePath>
+              <FilePath>..\Libraries\STM32F10x_StdPeriph_Driver\src\stm32f10x_gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_rcc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Libraries\STM32F10x_StdPeriph_Driver\src\stm32f10x_rcc.c</FilePath>
+              <FilePath>..\Libraries\STM32F10x_StdPeriph_Driver\src\stm32f10x_rcc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -498,12 +483,12 @@
             <File>
               <FileName>core_cm3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Libraries\CMSIS\core_cm3.c</FilePath>
+              <FilePath>..\Libraries\CMSIS\core_cm3.c</FilePath>
             </File>
             <File>
               <FileName>system_stm32f10x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Libraries\CMSIS\system_stm32f10x.c</FilePath>
+              <FilePath>..\Libraries\CMSIS\system_stm32f10x.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -513,7 +498,7 @@
             <File>
               <FileName>startup_stm32f10x_hd.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\Libraries\CMSIS\startup_stm32f10x_hd.s</FilePath>
+              <FilePath>..\Libraries\CMSIS\startup_stm32f10x_hd.s</FilePath>
             </File>
           </Files>
         </Group>

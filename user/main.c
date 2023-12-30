@@ -154,7 +154,7 @@ int main() {
    // 创建任务
    ENTER_CRITICAL_SECTION();
 
-   createTask( (TaskFunc_t) lightLed1,
+/*   createTask( (TaskFunc_t) lightLed1,
                (const char *) "lightLed1",
                (uint32_t  ) 50,
                (void *) NULL,
@@ -166,7 +166,7 @@ int main() {
             (uint32_t  ) 50,
             (void *) NULL,
             (UBase_t) 2,
-            (TaskHandle_t *)lightLed2Handler);
+            (TaskHandle_t *)lightLed2Handler);*/
 
     createTask( (TaskFunc_t) shutLeds,
             (const char *) "shutLeds",

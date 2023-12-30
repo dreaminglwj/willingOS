@@ -13,11 +13,13 @@ void initWilling(OSErr *err) {
      initNVICPriorityGroup(NVIC_PriorityGroup_4);
 }
 
+void initNVICPriorityGroup(uint32_t priorityGroup) {
+    SysCtrlBlock->AIRCR = AIRCR_VECTKEY_MASK | priorityGroup;
+}
+
 
 void willingStart(OSErr *err) {
     OSStart();
 }
 
-void initNVICPriorityGroup(uint32_t priorityGroup) {
-    SysCtrlBlock->AIRCR = AIRCR_VECTKEY_MASK | priorityGroup;
-}
+

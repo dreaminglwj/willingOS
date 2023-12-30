@@ -122,6 +122,7 @@ void setupTimerInterrupt( void ) {
     SysTickCtrl->CtrlReg = ( NVIC_SYSTICK_CLK_BIT | NVIC_SYSTICK_INT_BIT | NVIC_SYSTICK_ENABLE_BIT );
 }
 
+
 static void startFirstTask( void );
 
 Base_t startWillingScheduler( void ) {
