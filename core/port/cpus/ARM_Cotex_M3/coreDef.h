@@ -84,34 +84,34 @@ typedef struct
 
 
 //#define SysTick_CTRL_COUNTFLAG_Pos         16                                            
-#define SysTick_CTRL_COUNTFLAG_Mask         (1ul << SysTick_CTRL_COUNTFLAG_Pos)          
+// #define SysTick_CTRL_COUNTFLAG_Mask         (1ul << SysTick_CTRL_COUNTFLAG_Pos)          
 
-//#define SysTick_CTRL_CLKSOURCE_Pos          2                                             
-#define SysTick_CTRL_CLKSOURCE_Mask         (1ul << SysTick_CTRL_CLKSOURCE_Pos)         
+// //#define SysTick_CTRL_CLKSOURCE_Pos          2                                             
+// #define SysTick_CTRL_CLKSOURCE_Mask         (1ul << SysTick_CTRL_CLKSOURCE_Pos)         
 
-#define SysTick_CTRL_TICK_INTERRUPT_Pos     1                                           
-#define SysTick_CTRL_TICK_INTERRUPT_Mask    (1ul << SysTick_CTRL_TICK_INTERRUPT_Pos)    
+// #define SysTick_CTRL_TICK_INTERRUPT_Pos     1                                           
+// #define SysTick_CTRL_TICK_INTERRUPT_Mask    (1ul << SysTick_CTRL_TICK_INTERRUPT_Pos)    
 
-#define SysTick_CTRL_ENABLE_Pos             0                                           
-#define SysTick_CTRL_ENABLE_Mask            (1ul << SysTick_CTRL_ENABLE_Pos)            
+// //#define SysTick_CTRL_ENABLE_Pos             0                                           
+// #define SysTick_CTRL_ENABLE_Mask            (1ul << SysTick_CTRL_ENABLE_Pos)            
 
-/* SysTick Reload Register Definitions */
-#define SysTick_RELOAD_RELOAD_Pos             0                                         
-#define SysTick_RELOAD_RELOAD_Mask            (0xFFFFFFul << SysTick_RELOAD_RELOAD_Pos) 
+// /* SysTick Reload Register Definitions */
+// #define SysTick_RELOAD_RELOAD_Pos             0                                         
+// #define SysTick_RELOAD_RELOAD_Mask            (0xFFFFFFul << SysTick_RELOAD_RELOAD_Pos) 
 
-/* SysTick Current Register Definitions */
-#define SysTick_CUR_VALUE_Pos                 0                                         
-#define SysTick_CUR_VALUE_Mask                (0xFFFFFFul << SysTick_CUR_VALUE_Pos)     
+// /* SysTick Current Register Definitions */
+// #define SysTick_CUR_VALUE_Pos                 0                                         
+// #define SysTick_CUR_VALUE_Mask                (0xFFFFFFul << SysTick_CUR_VALUE_Pos)     
 
-/* SysTick Calibration Register Definitions */
-#define SysTick_CALIBRATION_NOREF_Pos            31                                     
-#define SysTick_CALIBRATION_NOREF_Mask            (1ul << SysTick_CALIBRATION_NOREF_Pos)
+// /* SysTick Calibration Register Definitions */
+// #define SysTick_CALIBRATION_NOREF_Pos            31                                     
+// #define SysTick_CALIBRATION_NOREF_Mask            (1ul << SysTick_CALIBRATION_NOREF_Pos)
 
-#define SysTick_CALIBRATION_SKEW_Pos             30                                     
-#define SysTick_CALIBRATION_SKEW_Mask             (1ul << SysTick_CALIBRATION_SKEW_Pos) 
+// #define SysTick_CALIBRATION_SKEW_Pos             30                                     
+// #define SysTick_CALIBRATION_SKEW_Mask             (1ul << SysTick_CALIBRATION_SKEW_Pos) 
 
-#define SysTick_CALIBRATION_TENMS_Pos             0                                     
-#define SysTick_CALIBRATION_TENMS_Mask            (0xFFFFFFul << SysTick_CUR_VALUE_Pos) 
+// #define SysTick_CALIBRATION_TENMS_Pos             0                                     
+// #define SysTick_CALIBRATION_TENMS_Mask            (0xFFFFFFul << SysTick_CUR_VALUE_Pos) 
 
 
 

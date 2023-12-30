@@ -1,7 +1,5 @@
 #include "sysTick.h"
-#include "cpu.h"
-#include "willingOSConfig.h"
-#include "coreDef.h"
+
 
 void setSysTickClkSource(uint32_t source) {
     if ( IsSysTickClkSource( source ) ) {
@@ -21,9 +19,9 @@ void initSysTick( uint8_t sysClk ) {
 												     reload为24位寄存器,最大值:16777216,在72M下,约0.233s */
 
     /* 配置硬件 */
-    SysTickCtrl->CtrlReg |= SysTick_CTRL_TICK_INTERRUPT_Mask; /* 开启systick 中断 */
+    SysTickCtrl->CtrlReg |= SysTick_CTRL_TICKINT_Msk; /* 开启systick 中断 */
     SysTickCtrl->ReloadReg = reloadValue; /* 每1/SYS_TICK_RATE秒中断一次 */
-    SysTickCtrl->CtrlReg |= SysTick_CTRL_ENABLE_Mask; /* 开启SysTick */
+    SysTickCtrl->CtrlReg |= SysTick_CTRL_ENABLE_Msk; /* 开启SysTick */
 }
 
 

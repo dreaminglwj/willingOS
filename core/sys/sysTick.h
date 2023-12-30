@@ -2,6 +2,12 @@
 #define SYS_TICK_H
 #include <stdint.h>
 
+#include "willingOSConfig.h"
+#include "coreDef.h"
+#include "system_stm32f10x.h"
+#include "stm32f10x.h"
+// #include "core_cm3.h"
+
 #define SysTickClkSourceHCLKDiv8    ((uint32_t)0xFFFFFFFB) /* AHB clock divided by 8 selected as systick clock source */
 #define SysTickClkSourceHCLK        ((uint32_t)0x00000004) /* ANB clock selected as systick clock source */
 #define IsSysTickClkSource(source) (((source) == SysTickClkSourceHCLK) || \

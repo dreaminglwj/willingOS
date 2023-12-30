@@ -2,6 +2,8 @@
 #include "willingOS.h"
 #include "coreDef.h"
 #include "task.h"
+#include "stm32f10x_gpio.h"
+#include "stm32f10x_rcc.h"
 
 #define PERIPH_BASE           ((uint32_t)0x40000000) /*!< Peripheral base address in the alias region */
 #define APB2PERIPH_BASE       (PERIPH_BASE + 0x10000)
@@ -79,14 +81,75 @@ void lightLed2( void *param ) {
 
 void shutLeds( void *param ) {
     while(1) {
-        LED1 = 0;
-        LED2 = 0;
+			
+        LED1 = 1;
+        LED2 = 1;
     }
 }
 
+
+//#include "system.h"
+
+/*  LEDÊ±ÖÓ¶Ë¿Ú¡¢Òý½Å¶¨Òå */
+#define LED1_PORT 			GPIOB   
+#define LED1_PIN 			GPIO_Pin_5
+#define LED1_PORT_RCC		RCC_APB2Periph_GPIOB
+
+#define LED2_PORT 			GPIOE   
+#define LED2_PIN 			GPIO_Pin_5
+#define LED2_PORT_RCC		RCC_APB2Periph_GPIOE
+
+
+//#define LED1 PBout(5)  	
+//#define LED2 PEout(5)  	
+
+
+//void LED_Init(void);
+
+
+//#endif
+
+void delay(u32 i)
+{
+	while(i--);
+}
+
+void initLed( void ) {
+	GPIO_InitTypeDef GPIO_InitStructure;//¶¨Òå½á¹¹Ìå±äÁ¿
+	
+	RCC_APB2PeriphClockCmd(LED1_PORT_RCC|LED2_PORT_RCC,ENABLE);
+	
+	GPIO_InitStructure.GPIO_Pin=LED1_PIN;  //Ñ¡ÔñÄãÒªÉèÖÃµÄIO¿Ú
+	GPIO_InitStructure.GPIO_Mode=GPIO_Mode_Out_PP;	 //ÉèÖÃÍÆÍìÊä³öÄ£Ê½
+	GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;	  //ÉèÖÃ´«ÊäËÙÂÊ
+	GPIO_Init(LED1_PORT,&GPIO_InitStructure); 	   /* ³õÊ¼»¯GPIO */
+	GPIO_SetBits(LED1_PORT,LED1_PIN);   //½«LED¶Ë¿ÚÀ­¸ß£¬Ï¨ÃðËùÓÐLED
+	
+	GPIO_InitStructure.GPIO_Pin=LED2_PIN;  //Ñ¡ÔñÄãÒªÉèÖÃµÄIO¿Ú
+	GPIO_Init(LED2_PORT,&GPIO_InitStructure); 	   /* ³õÊ¼»¯GPIO */
+	GPIO_SetBits(LED2_PORT,LED2_PIN);   //½«LED¶Ë¿ÚÀ­¸ß£¬Ï¨ÃðËùÓÐLED
+}
+
 int main() {
+
+// 	initLed();
+	
+// 	LED1 = 0;
+// 	LED2 = 0;
+	
+//   while(1)
+// 	{
+// 		LED1=!LED1;
+// 		LED2=!LED2;
+// 		delay(6000000);
+// 	}
    OSErr err;
    initWilling(&err);
+   initLed();
+	
+	 	LED1 = 0;
+ 	  LED2 = 0;
+
 
    // 创建任务
    ENTER_CRITICAL_SECTION();
@@ -114,7 +177,7 @@ int main() {
 
    EXIT_CRITICAL_SECTION();
 
-   willingStart(&err);
+   willingStart(&err); 
 
     return 0;
 }
