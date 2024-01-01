@@ -22,6 +22,7 @@ typedef struct taskControlBlock {
 typedef TCB TCB_t;
 
 static volatile Base_t schedulerRunning = wFALSE;
+static volatile Base_t schedulerSuspended = wFALSE;
 static volatile uint32_t tickCount      = 0U;
 
 
@@ -169,10 +170,10 @@ Base_t sysTickService( void ) {
 
 
 Base_t getSchedulerState( void ) {
-    Base_t rlt = wFALSE;
+    Base_t rlt = SCHEDULER_STATE_RUNNING;
 
     /* todo: 完成具体实现 */
-    rlt = wTRUE;
+    rlt = SCHEDULER_STATE_RUNNING;
     return rlt;
 }
 
