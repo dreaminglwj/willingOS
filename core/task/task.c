@@ -148,11 +148,15 @@ static void initTask( TaskFunc_t taskFunc,
 
 /* 用于测试任务调度，暂时未加临界区，当三个任务都加入到数组后开启调度器 */
 static void addTaskToReadyArray( TCB_t * tcb ) {
+	uint16_t* taskNumAddr = &taskNum;
+	TCB_t ** taskArrayForTestAddr = taskArrayForTest;
     if ( taskNum > 2 ) {
         return;
     }
 
-    taskArrayForTest[taskNum++] = tcb;
+    taskArrayForTest[taskNum] = tcb;
+		taskNum++;
+		taskNum = taskNum;
 }
 
 /*  
@@ -173,7 +177,16 @@ Base_t getSchedulerState( void ) {
     Base_t rlt = SCHEDULER_STATE_RUNNING;
 
     /* todo: 完成具体实现 */
-    rlt = SCHEDULER_STATE_RUNNING;
+	if ( schedulerRunning == wFALSE ) {
+		rlt = SCHEDULER_STATE_WAITING;
+	} else {
+		if ( schedulerSuspended == wFALSE ) {
+			rlt = SCHEDULER_STATE_RUNNING;
+		} else {
+			rlt = SCHEDULER_STATE_SUSPENDED;
+		}
+	}
+    
     return rlt;
 }
 
@@ -190,6 +203,14 @@ void taskSwitchContext( void ) {
     currentTCB = taskArrayForTest[currentTaskIndex];
 }
 
+void idleTask(void) {
+	while(1) {
+		int i = 0;
+		i=1;
+		;
+	}
+}
+
 void OSStart(void) {
     DISABLE_INTERRUPTS();
     schedulerRunning = wTRUE;
@@ -200,9 +221,13 @@ void OSStart(void) {
     } else {
 
     }
+		
+		idleTask();
 }
 
 void OSStop(void) {
 
 }
+
+
 

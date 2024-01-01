@@ -128,28 +128,16 @@ void DebugMon_Handler(void)
 //void PendSV_Handler(void)
 //{
 //}
-extern void xPortSysTickHandler(void);
-/**
-  * @brief  This function handles SysTick Handler.
-  * @param  None
-  * @retval None
-  */
-// void SysTick_Handler(void)
-// {
-// 	if(getSchedulerState()!=SCHEDULER_STATE_SUSPENDED)//ϵͳ�Ѿ�����
-//     {
-//         xPortSysTickHandler();	
-//     }
-// }
+
 
 void SysTick_Handler( void ) {
-/*	led1Stat = !led1Stat;
+ /*	led1Stat = !led1Stat;
 	led2Stat = !led2Stat;
 	
 	LED1 = led1Stat;
 	LED2 = led2Stat;*/
 
-    if ( getSchedulerState() != SCHEDULER_STATE_WAITING ) {
+   if ( getSchedulerState() != SCHEDULER_STATE_WAITING ) {
         sysTickHandler();
     }	
 }

@@ -9,27 +9,48 @@
 uint16_t led1Stat = 0;
 uint16_t led2Stat = 1;
 
+uint32_t countMax = 72000000;
+
+void sharling(void) {
+	led1Stat = !led1Stat;
+	led2Stat = !led2Stat;
+	
+	LED1 = led1Stat;
+	LED2 = led2Stat;
+	led1Stat = led1Stat;
+}
+
 void lightLed1( void *param ) {
+    uint32_t count = 0;
     while (1)
     {
-       LED1 = 1;
+        count++;
+        if (count >= countMax) {
+            count = 0;
+            led1Stat = !led1Stat;
+        }
+       LED1 = led1Stat;
     }
-    
 }
 
 void lightLed2( void *param ) {
+    uint32_t count = 0;
     while (1)
     {
-        LED2 = 1;
+        count++;
+        if (count >= countMax) {
+            count = 0;
+            led2Stat = !led2Stat;
+        }
+       LED2 = led2Stat;
     }
-    
 }
 
 void shutLeds( void *param ) {
     while(1) {
-			
-        LED1 = 1;
-        LED2 = 1;
+			;
+        // LED1 = 1;
+        // LED2 = 1;
     }
 }
 

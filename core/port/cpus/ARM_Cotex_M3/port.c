@@ -4,6 +4,7 @@
 #include "willing.h"
 #include "willingOSConfig.h"
 #include "stm32f10x.h"
+#include "led.h"
 
 #ifdef SYSCLK_FREQUENCE_72MHz
     uint32_t SysClockFrequence = SYSCLK_FREQUENCE_72MHz;
@@ -204,11 +205,14 @@ __asm void startFirstTask( void ) {
 }
 
 __asm void pendSVHandler( void ) {
-    extern criticalNesting;
+	
+	  extern criticalNesting;
     extern currentTCB;
     extern taskSwitchContext;
-
-    PRESERVE8
+	
+	 
+	
+       PRESERVE8
 
     mrs r0, psp /* 将当前任务的堆栈指针（PSP）加载到寄存器r0中 */
     isb /* 指令同步屏障 */
@@ -236,4 +240,20 @@ __asm void pendSVHandler( void ) {
     isb
     bx r14
     nop
+	
+
+}
+
+/* 用于测试pendsv是否被调用 */
+void pendSVHandler1( void ) {
+
+	extern void sharling();
+	sharling();
+	
+	 //extern sharling;
+	
+   //bl sharling
+	 //mov pc,lr
+	
+
 }

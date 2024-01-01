@@ -17,7 +17,7 @@ Library Manager: ArmAr.exe V5.06 update 6 (build 750)
 Hex Converter:   FromElf.exe V5.06 update 6 (build 750)
 CPU DLL:         SARMCM3.DLL V5.28.0.0
 Dialog DLL:      DCM.DLL V1.17.3.0
-Target DLL:      UL2CM3.DLL V1.162.16.0
+Target DLL:      CMSIS_AGDI.dll V1.31.18.0
 Dialog DLL:      TCM.DLL V1.36.2.0
  
 <h2>Project:</h2>
@@ -28,13 +28,17 @@ Project File Date:  01/01/2024
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'D:\KEIL_5\ARM\ARMCC\Bin'
 Rebuild target 'willingOS'
 compiling task.c...
-compiling willingOS.c...
+..\core\task\task.c(151): warning:  #177-D: variable "taskNumAddr"  was declared but never referenced
+  	uint16_t* taskNumAddr = &taskNum;
+..\core\task\task.c(152): warning:  #177-D: variable "taskArrayForTestAddr"  was declared but never referenced
+  	TCB_t ** taskArrayForTestAddr = taskArrayForTest;
+..\core\task\task.c(208): warning:  #550-D: variable "i"  was set but never used
+  		int i = 0;
+..\core\task\task.c: 3 warnings, 0 errors
 compiling main.c...
-..\user\main.c(78): warning:  #111-D: statement is unreachable
-      return 0;
-..\user\main.c: 1 warning, 0 errors
-compiling stm32f10x_it.c...
 compiling systick.c...
+compiling stm32f10x_it.c...
+compiling willingOS.c...
 compiling memory.c...
 compiling core_cm3.c...
 compiling port.c...
@@ -44,23 +48,23 @@ compiling stm32f10x_rcc.c...
 compiling system_stm32f10x.c...
 compiling led.c...
 linking...
-Program Size: Code=1984 RO-data=336 RW-data=56 ZI-data=1024  
+Program Size: Code=3180 RO-data=336 RW-data=88 ZI-data=1536  
 FromELF: creating hex file...
-".\Objects\willingOS.axf" - 0 Error(s), 1 Warning(s).
+".\Objects\willingOS.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
-Package Vendor: ARM
-                http://www.keil.com/pack/ARM.CMSIS.5.5.1.pack
-                ARM.CMSIS.5.5.1
-                CMSIS (Cortex Microcontroller Software Interface Standard)
+Package Vendor: Keil
+                https://www.keil.com/pack/Keil.STM32F1xx_DFP.2.4.1.pack
+                Keil.STM32F1xx_DFP.2.4.1
+                STMicroelectronics STM32F1 Series Device Support, Drivers and Examples
 
 <h2>Collection of Component include folders:</h2>
   .\RTE\_willingOS
-  D:\KEIL5\Arm\Packs\ARM\CMSIS\5.5.1\Device\ARM\ARMCM3\Include
+  D:\KEIL5\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

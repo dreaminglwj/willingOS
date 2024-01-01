@@ -69,6 +69,8 @@
 extern uint16_t led1Stat;
 extern uint16_t led2Stat;
 
+extern void sharling(void);
+
 extern void lightLed1( void *param );
 
 extern void lightLed2( void *param );
