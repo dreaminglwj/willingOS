@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\user;..\Libraries\CMSIS;..\Libraries\STM32F10x_StdPeriph_Driver\inc;..\core;..\core\sys;..\include;..\core\port\cpus\ARM_Cotex_M3;..\core\cpu\ARM-Cortex-M3</IncludePath>
+              <IncludePath>..\user;..\Libraries\CMSIS;..\Libraries\STM32F10x_StdPeriph_Driver\inc;..\core;..\core\sys;..\include;..\core\port\cpus\ARM_Cotex_M3;..\core\cpu\ARM-Cortex-M3;..\app\led</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -499,6 +499,21 @@
               <FileName>startup_stm32f10x_hd.s</FileName>
               <FileType>2</FileType>
               <FilePath>..\Libraries\CMSIS\startup_stm32f10x_hd.s</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>led</GroupName>
+          <Files>
+            <File>
+              <FileName>led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\led\led.c</FilePath>
+            </File>
+            <File>
+              <FileName>led.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\app\led\led.h</FilePath>
             </File>
           </Files>
         </Group>

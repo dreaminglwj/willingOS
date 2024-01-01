@@ -71,7 +71,7 @@ extern "c" {
 
 #define SYS_TICK_BASE       (SYS_CTRL_BASE + 0X10) /* 系统节拍控制基地址 */
 
-
+/*
 typedef struct
 {
   __IO uint32_t CtrlReg;                         
@@ -80,7 +80,7 @@ typedef struct
   __I  uint32_t SysTickCalibrationReg;                       
 } SysTick_t;
 
-#define SysTickCtrl ((SysTick_t*) SYS_TICK_BASE) /* sysTick寄存器组指针 */
+#define SysTickCtrl ((SysTick_t*) SYS_TICK_BASE)  sysTick寄存器组指针 */
 
 
 //#define SysTick_CTRL_COUNTFLAG_Pos         16                                            

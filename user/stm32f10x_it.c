@@ -25,6 +25,7 @@
 #include "stm32f10x_it.h"
 #include "task.h" 
 #include "protable.h"
+#include "led.h"
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{
   */
@@ -142,9 +143,15 @@ extern void xPortSysTickHandler(void);
 // }
 
 void SysTick_Handler( void ) {
+/*	led1Stat = !led1Stat;
+	led2Stat = !led2Stat;
+	
+	LED1 = led1Stat;
+	LED2 = led2Stat;*/
+
     if ( getSchedulerState() != SCHEDULER_STATE_WAITING ) {
         sysTickHandler();
-    }
+    }	
 }
 
 /******************************************************************************/

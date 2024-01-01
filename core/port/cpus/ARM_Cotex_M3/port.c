@@ -3,6 +3,7 @@
 #include "task.h"
 #include "willing.h"
 #include "willingOSConfig.h"
+#include "stm32f10x.h"
 
 #ifdef SYSCLK_FREQUENCE_72MHz
     uint32_t SysClockFrequence = SYSCLK_FREQUENCE_72MHz;
@@ -118,8 +119,8 @@ void ensureHighestISRPriority( void ) {
 }
 
 void setupTimerInterrupt( void ) {
-    SysTickCtrl->ReloadReg = ( SYS_TICK_CLOCK_RATE / SYS_TICK_RATE ) - 1UL;
-    SysTickCtrl->CtrlReg = ( NVIC_SYSTICK_CLK_BIT | NVIC_SYSTICK_INT_BIT | NVIC_SYSTICK_ENABLE_BIT );
+    SysTick->LOAD = ( SYS_TICK_CLOCK_RATE / SYS_TICK_RATE ) - 1UL;
+    SysTick->CTRL = ( NVIC_SYSTICK_CLK_BIT | NVIC_SYSTICK_INT_BIT | NVIC_SYSTICK_ENABLE_BIT );
 }
 
 
