@@ -9,7 +9,7 @@
 uint16_t led1Stat = 0;
 uint16_t led2Stat = 1;
 
-uint32_t countMax = 72000000;
+uint32_t countMax = 360000;
 
 void sharling(void) {
 	led1Stat = !led1Stat;

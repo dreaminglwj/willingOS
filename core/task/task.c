@@ -150,6 +150,7 @@ static void initTask( TaskFunc_t taskFunc,
 static void addTaskToReadyArray( TCB_t * tcb ) {
 	uint16_t* taskNumAddr = &taskNum;
 	TCB_t ** taskArrayForTestAddr = taskArrayForTest;
+	TCB_t ** taskArrayForTestAddr2 = taskArrayForTest + 2;
     if ( taskNum > 2 ) {
         return;
     }
@@ -157,6 +158,8 @@ static void addTaskToReadyArray( TCB_t * tcb ) {
     taskArrayForTest[taskNum] = tcb;
 		taskNum++;
 		taskNum = taskNum;
+        // todo：检查范围，否则存在越界风险
+    currentTCB = taskArrayForTest[currentTaskIndex];
 }
 
 /*  

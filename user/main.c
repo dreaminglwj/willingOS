@@ -70,6 +70,7 @@ int main() {
             (void *) NULL,
             (UBase_t) 2,
             (TaskHandle_t *)shutLedsHandler);
+ 
 
    EXIT_CRITICAL_SECTION();
 

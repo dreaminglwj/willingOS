@@ -206,7 +206,7 @@ __asm void startFirstTask( void ) {
 
 __asm void pendSVHandler( void ) {
 	
-	  extern criticalNesting;
+	extern criticalNesting;
     extern currentTCB;
     extern taskSwitchContext;
 	
