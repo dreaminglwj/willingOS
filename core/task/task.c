@@ -98,8 +98,8 @@ static void initTask( TaskFunc_t taskFunc,
                             const uint32_t stackSize,
                             void * const params,
                             UBase_t priority,
-														TCB_t * tcb,
-														TaskHandle_t * const taskHandler) {
+							TCB_t * tcb,
+							TaskHandle_t * const taskHandler) {
     Stack_t * topOfStack = NULL;
     UBase_t i = 0;
 
