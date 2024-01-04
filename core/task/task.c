@@ -14,6 +14,10 @@ typedef struct taskControlBlock {
     Stack_t *stack; /* 栈底指针，指向栈的起始位置 */
     ULong_t priority;
 
+    /* delay相关 */
+    uint32_t delayExpireAt; /* 延时结束时间，为n个tickCount，0表示没有延时 */
+    uint8_t   tickCountSession; /* tickCount会话 */
+
     char taskName[ MAX_TASK_NAME_LEN ]; /* 任务名称 */
 } TCB;
 
@@ -24,6 +28,7 @@ typedef TCB TCB_t;
 static volatile Base_t schedulerRunning = wFALSE;
 static volatile Base_t schedulerSuspended = wFALSE;
 static volatile uint32_t tickCount      = 0U;
+static volatile uint8_t  tickCountSession = 0U;
 
 
 TCB_t * taskArrayForTest[MAX_TASK_NUM];
@@ -55,6 +60,7 @@ Long_t createTask( TaskFunc_t taskFunc, /* 任务函数 */
                     TaskHandle_t * const taskHandler /* 任务句柄 */ ) {
     TCB_t * tcb = NULL;
     Long_t rlt = -1;
+
 
     /* 堆栈向上增长（正向生长，51单片机）：从低地址（0x00）向高地址(0xFF)增长
     堆栈向下增长（逆向生长，80x86和cotex-M3）：从高地址(0xFF)向低地址（0x00）增长 */
@@ -134,6 +140,9 @@ static void initTask( TaskFunc_t taskFunc,
     } else {
         tcb->priority = priority;
     }
+
+    tcb->delayExpireAt =  DELAY_VALUE_NO_DELAY;
+    tcb->tickCountSession = tickCountSession;
 
     tcb->stackTop = initStack( topOfStack, taskFunc, params );
 

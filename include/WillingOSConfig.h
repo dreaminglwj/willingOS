@@ -11,6 +11,8 @@
 #define SYS_TICK_RATE ((uint32_t) 10)
 #define SYS_TICK_CLOCK_RATE (SysClockFrequence)
 
+#define DELAY_VALUE_NO_DELAY (0)
+
 /******************************************************************
             与中断有关的配置选项                                                 
 ******************************************************************/

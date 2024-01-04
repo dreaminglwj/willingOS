@@ -264,6 +264,8 @@ static willingFORCE_INLINE void clearBasePriorityFromISR( void ) {
 #define assrtFunc(char,int) printf("Error:%s,%d\r\n",char,int)
 #define willingAssert(x) if((x)==0) assrtFunc(__FILE__,__LINE__)
 
+
+
 #ifdef __cplusplus
 }
 #endif
