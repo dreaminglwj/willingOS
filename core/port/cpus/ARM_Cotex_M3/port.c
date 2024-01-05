@@ -70,6 +70,11 @@ void sysTickHandler( void ) {
     /* 屏蔽相关中断 */
     maximizeBasePriority();
     {
+        tickCount++;
+        if ( tickCount == 0 ) {
+            tickCountSession = !tickCountSession;
+        }
+        
         processDelay();
         
         /* 调用系统时钟节拍服务 */

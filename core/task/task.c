@@ -27,22 +27,27 @@ typedef struct taskControlBlock {
 typedef TCB TCB_t;
 
 static volatile Base_t schedulerRunning = wFALSE;
-static volatile Base_t schedulerSuspended = wFALSE;
+static volatile Base_t schedulerSuspended = 0;
 static volatile uint32_t tickCount      = 0U;
 static volatile uint8_t  tickCountSession = 0U;
 
 
 /* 任务队列 */
 
-TCB_t * taskArrayForTest[MAX_TASK_NUM];
-uint16_t taskNum = 0;
-TCB_t * volatile currentTCB = NULL;
-uint16_t currentTaskIndex =0;
+// TCB_t * taskArrayForTest[MAX_TASK_NUM];
+// uint16_t taskNum = 0;
+// TCB_t * volatile currentTCB = NULL;
+// uint16_t currentTaskIndex =0;
 
 List_t readyTaskList;
 List_t suspendTaskList;
-ListItem_t * currentItem = NULL;
+ListItem_t * currentTaskItem = NULL;
 TCB_t * volatile currentTCB = NULL;
+ListItem_t * nextTaskItem = NULL; /* 在sysTickService中确定要不要调度的时候就决定好下一步调度到哪个任务
+                                                        避免在switch的时候再来遍历链表。
+                                                        todo：测试会不会产生调度之前又发生变化的问题 */
+TaskHandle_t idleTaskHandler;
+
 
 
 
@@ -186,9 +191,34 @@ static void addTaskToReadyArray( TCB_t * tcb ) {
 */
 Base_t sysTickService( void ) {
     Base_t needSwitchCtx = wFALSE;
-    // 暂时默认需要切换
-    // todo: 需要根据系统suspend状态等来判定是否需要进行调度
-    needSwitchCtx = wTRUE;
+    willingAssert( readyTaskList.itemNum );
+
+    if (  readyTaskList.itemNum == 1 && readyTaskList.head->tcbWith == currentTCB )  {
+        needSwitchCtx = wFALSE;
+    } else {
+        // 查找优先级大于等于当前任务的tcb，找到则切换
+        // todo: 优化效率，遍历链表太慢了
+        ListItem_t * item = readyTaskList.head;
+        if ( item->tcbWith != currentTCB &&  item->tcbWith->priority >= currentTCB->priority ) {
+                nextTaskItem = item;
+        } else {
+            while (1) {
+                item = getWillingListNextItem( &readyTaskList, item );
+                if ( item == NULL ) {
+                    needSwitchCtx = wFALSE;
+                    break;
+                } 
+
+                if ( item->tcbWith != currentTCB &&  item->tcbWith->priority >= currentTCB->priority ) {
+                    nextTaskItem = item;
+                    needSwitchCtx = wTRUE;
+                    break;
+                }
+
+                //  todo：对于多次tick的都没有被调用的任务，进行优先级提升
+            } 
+        }
+    }
 
     return needSwitchCtx;
 }
@@ -203,7 +233,11 @@ Base_t getSchedulerState( void ) {
 		rlt = SCHEDULER_STATE_WAITING;
 	} else {
 		if ( schedulerSuspended == wFALSE ) {
-			rlt = SCHEDULER_STATE_RUNNING;
+            if ( readyTaskList.itemNum == 0 ) { // todo: 确认这样做是否可行，没有任务在跑系统是否能持续运转？或者一直在跑当前要停掉的任务？极大可能这段代码要删掉，改成插入一个idle任务
+                rlt =  SCHEDULER_STATE_SUSPENDED;
+            } else {
+               rlt = SCHEDULER_STATE_RUNNING;
+            }
 		} else {
 			rlt = SCHEDULER_STATE_SUSPENDED;
 		}
@@ -216,23 +250,39 @@ void taskSwitchContext( void ) {
     // 将curTcb指向下一个就绪的任务控制块
     willingAssert( readyTaskList.itemNum > 0 );
 
-    currentItem = getWillingListNextItem_Circle( &readyTaskList, currentItem );
-    willingAssert( currentItem );
+    if ( nextTaskItem != NULL  )  {
+        currentTaskItem = nextTaskItem;
+        nextTaskItem = NULL;
+        currentTCB = currentTaskItem->tcbWith;
+    }
 
-    currentTCB = currentItem->tcbWith;
+    // currentItem = getWillingListNextItem_Circle( &readyTaskList, currentItem );
+    // willingAssert( currentItem );
+
+    // currentTCB = currentItem->tcbWith;
 }
 
-// todo: 考虑去掉
-void idleTask(void) {
-	// while(1) {
-	// 	int i = 0;
-	// 	i=1;
-	// 	;
-	// }
+
+void idleTask(void * param) {
+	while(1) {
+		int i = 0; // 用于调试
+		i=1;
+		;
+	}
 }
 
 void OSStart(void) {
     DISABLE_INTERRUPTS();
+
+// idleTask，由于优先级比较低，所以当有其他任务的时候，idletask是不会被执行的
+    createTask( (TaskFunc_t) idleTask,
+            (const char *) "idleTask",
+            (uint32_t  ) 50,
+            (void *) NULL,
+            (UBase_t) MIN_PRIORITY_VALUE,
+            (TaskHandle_t *) idleTaskHandler);
+
+
     schedulerRunning = wTRUE;
     tickCount = 0U;
 
@@ -241,8 +291,6 @@ void OSStart(void) {
     } else {
 
     }
-		
-		idleTask();
 }
 
 void OSStop(void) {
@@ -250,9 +298,87 @@ void OSStop(void) {
 }
 
 // 单位ms
-void sleepTask_ms( uint_32 n ) {
+void willingSleep_ms( uint_32 n ) {
+    uint32_t ticks = ( n * SYS_TICK_RATE ) / 1000; // n / ( 1000 / SYS_TICK_RATE )
+    UBase_t rlt = 0;
 
+    suspendScheduler();
+
+    currentTCB->delayExpireAt = tickCount + ticks;
+    if ( currentTCB->delayExpireAt < tickCount ) {
+        currentTCB->tickCountSession = !tickCountSession;
+    } else {
+        currentTCB->tickCountSession = tickCountSession;
+    }
+
+    currentTaskItem->sortValue = currentTCB->delayExpireAt;
+    currentTaskItem->tickCountSession = currentTCB->tickCountSession;
+
+//  todo: 存在风险，可能会跳过下一个任务，要去看看switch函数怎么实现的，什么时候调用的
+// 当就绪列表中没有任务的时候应该插入一个idleTask
+//    ListItem_t * next = getWillingListNextItem_Circle( &readyTaskList, currentTaskItem );
+//    if ( next == NULL ) {
+//       /* todo: 插入一个idleTask，或者在初始化的时候插入一个，但是要保证这个任务不占cpu时间 */
+//    }
+     
+    removeWillingListItem( &readyTaskList, currentTaskItem );
+    rlt = insertWillingList_Sort( &suspendTaskList,  currentTaskItem );
+    willingAssert(rlt);
+    // currentTaskItem = next;
+
+    resumeScheduler();
 }
 
 
+void suspendScheduler(void) {
+    ++suspendScheduler;
+}
 
+
+UBase_t resumeScheduler(void) {
+    if ( suspendScheduler > 0 ) {
+        --suspendScheduler;
+    }
+
+    if ( suspendScheduler == 0 ) { // 开启调度
+        //  产生一个PendSV中断
+        willingAssert( sysTickService() == wTRUE )
+            
+        NVIC_INTERRUPUT_CTRL_REG = NVIC_PENDSV_SET_BIT;
+    }
+
+    return suspendScheduler;
+}
+
+
+void processDelay( void ) {
+    // tickCount++;
+    // if ( tickCount == 0 ) {
+    //     tickCountSession = !tickCountSession;
+    // }
+
+    // todo:  处理suspend队列，如果有定时时间到的任务，移动到就绪队列
+    ListItem_t * item = getWillingListHeadItem(&suspendTaskList);
+    TCB_t * tcb = NULL;
+    if ( item == NULL ) {
+        return;
+    }
+
+    tcb = item->tcbWith;
+    if ( tcb->tickCountSession == tickCountSession && tcb->delayExpireAt <= tickCount  ) {
+        removeWillingListItem( &suspendTaskList, item );
+        insertWillingList_Head( &readyTaskList, item );
+    }
+
+    for (;;) {
+        item = getWillingListNextItem(&suspendTaskList);
+        if ( item == NULL ) {
+            break;
+        }
+         tcb = item->tcbWith;
+        if ( tcb->tickCountSession == tickCountSession && tcb->delayExpireAt <= tickCount  ) {
+            removeWillingListItem( &suspendTaskList, item );
+            insertWillingList_Head( &readyTaskList, item );
+        }
+    }
+}

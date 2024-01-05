@@ -25,6 +25,7 @@ void initNVICPriorityGroup(uint32_t priorityGroup) {
 
 
 void willingStart(OSErr *err) {
+    initKernel();
     OSStart();
 }
 
@@ -43,14 +44,7 @@ void initKernel( void ) {
 }
 
 
-void processDelay( void ) {
-    tickCount++;
-    if ( tickCount == 0 ) {
-        tickCountSession = !tickCountSession;
-    }
 
-    // todo:  处理suspend队列，如果有定时时间到的任务，移动到就绪队列
-}
 
 
 

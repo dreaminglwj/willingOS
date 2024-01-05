@@ -10,6 +10,6 @@ typedef  enum  os_err {
 void initWilling(OSErr *err);
 void willingStart(OSErr *err);
 
-void processDelay( void );
+
 
 #endif

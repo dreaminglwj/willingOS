@@ -54,22 +54,22 @@ int main() {
                (const char *) "lightLed1",
                (uint32_t  ) 50,
                (void *) NULL,
-               (UBase_t) 2,
+               (UBase_t)SUGGESTED_PRIORITY,
                (TaskHandle_t *)lightLed1Handler);
 
     createTask( (TaskFunc_t) lightLed2,
             (const char *) "lightLed2",
             (uint32_t  ) 50,
             (void *) NULL,
-            (UBase_t) 2,
+            (UBase_t) SUGGESTED_PRIORITY,
             (TaskHandle_t *)lightLed2Handler);
 
-    createTask( (TaskFunc_t) shutLeds,
-            (const char *) "shutLeds",
-            (uint32_t  ) 50,
-            (void *) NULL,
-            (UBase_t) 2,
-            (TaskHandle_t *)shutLedsHandler);
+//     createTask( (TaskFunc_t) shutLeds,
+//             (const char *) "shutLeds",
+//             (uint32_t  ) 50,
+//             (void *) NULL,
+//             (UBase_t) SUGGESTED_PRIORITY,
+//             (TaskHandle_t *)shutLedsHandler);
  
 
    EXIT_CRITICAL_SECTION();

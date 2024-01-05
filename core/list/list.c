@@ -61,16 +61,44 @@ UBase_t insertWillingList_Sort(  List_t * const list, ListItem_t * const item  )
 }
 
 
-// UBase_t insertWillingList_End( List_t * const list, ListItem_t * const item ) {
-//     if ( list == NULL || item == NULL ) {
-//         return 0;
-//     }
+UBase_t insertWillingList_End( List_t * const list, ListItem_t * const item ) {
+    if ( list == NULL || item == NULL ) {
+        return 0;
+    }
+
+    if ( list->tail == NULL ) {
+        list->head = item;
+        item->previous = NULL;
+    } else {
+        list->tail->next = item;
+    }
+
+    list->tail = item;
+    item->next = NULL;
+    list->itemNum++;
+    return list->itemNum;
+}
 
 
-// }
+UBase_t insertWillingList_Head( List_t * const list, ListItem_t * const item ) {
+    if ( list == NULL || item == NULL ) {
+        return 0;
+    }
+
+    if ( list->head == NULL ) {
+        list->head = item;
+        list->tail = item;
+    } else {
+        item->next = list->head->next;
+        list->head = item;
+    }
+
+    item->previous = NULL;
+    list->itemNum++;
+    return list->itemNum;
+}
 
 
-// UBase_t insertWillingList_Head( List_t * const list, ListItem_t * const item );
 UBase_t insertWillingList_Behind( List_t * const list, ListItem_t * const currentItem, ListItem_t * const item ) {
     if ( item == NULL || list == NULL ) {
         return 0;
