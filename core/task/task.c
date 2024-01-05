@@ -41,6 +41,8 @@ uint16_t currentTaskIndex =0;
 
 List_t readyTaskList;
 List_t suspendTaskList;
+ListItem_t * currentItem = NULL;
+TCB_t * volatile currentTCB = NULL;
 
 
 
@@ -164,27 +166,28 @@ static void initTask( TaskFunc_t taskFunc,
 
 /* 用于测试任务调度，暂时未加临界区，当三个任务都加入到数组后开启调度器 */
 static void addTaskToReadyArray( TCB_t * tcb ) {
-	uint16_t* taskNumAddr = &taskNum;
-	TCB_t ** taskArrayForTestAddr = taskArrayForTest;
-	TCB_t ** taskArrayForTestAddr2 = taskArrayForTest + 2;
-    if ( taskNum > 2 ) {
-        return;
-    }
 
-    taskArrayForTest[taskNum] = tcb;
-		taskNum++;
-		taskNum = taskNum;
-        // todo：检查范围，否则存在越界风险
-    currentTCB = taskArrayForTest[currentTaskIndex];
+    ListItem_t * item = ( ListItem_t *  ) willingMalloc(  sizeof(ListItem_t)  );
+    item->tcbWith = tcb;
+    item->listWith = &readyTaskList;
+
+    nums = insertWillingList_Behind( &readyTaskList, readyTaskList.tail,  item );
+    willingAssert( nums );
+
+    if ( currentTCB == NULL ) {
+        currentItem = item;
+        currentTCB = tcb;
+    }
 }
 
 /*  
-    统时钟服务函数，
+    系统时钟服务函数，
     调度算法函数在这个函数中调用
 */
 Base_t sysTickService( void ) {
     Base_t needSwitchCtx = wFALSE;
     // 暂时默认需要切换
+    // todo: 需要根据系统suspend状态等来判定是否需要进行调度
     needSwitchCtx = wTRUE;
 
     return needSwitchCtx;
@@ -211,23 +214,21 @@ Base_t getSchedulerState( void ) {
 
 void taskSwitchContext( void ) {
     // 将curTcb指向下一个就绪的任务控制块
-    willingAssert( taskNum > 0 );
+    willingAssert( readyTaskList.itemNum > 0 );
 
-    // todo: 以下操作会导致第一次启动的时候任务从第二个任务启动
-    currentTaskIndex++;
-    if ( currentTaskIndex >= taskNum ) { // 环状
-        currentTaskIndex = 0;
-    }
+    currentItem = getWillingListNextItem_Circle( &readyTaskList, currentItem );
+    willingAssert( currentItem );
 
-    currentTCB = taskArrayForTest[currentTaskIndex];
+    currentTCB = currentItem->tcbWith;
 }
 
+// todo: 考虑去掉
 void idleTask(void) {
-	while(1) {
-		int i = 0;
-		i=1;
-		;
-	}
+	// while(1) {
+	// 	int i = 0;
+	// 	i=1;
+	// 	;
+	// }
 }
 
 void OSStart(void) {
@@ -245,6 +246,11 @@ void OSStart(void) {
 }
 
 void OSStop(void) {
+
+}
+
+// 单位ms
+void sleepTask_ms( uint_32 n ) {
 
 }
 

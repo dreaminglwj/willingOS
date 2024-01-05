@@ -70,6 +70,8 @@ void sysTickHandler( void ) {
     /* 屏蔽相关中断 */
     maximizeBasePriority();
     {
+        processDelay();
+        
         /* 调用系统时钟节拍服务 */
         if ( sysTickService() == wTRUE ) {
             /* 
@@ -83,16 +85,6 @@ void sysTickHandler( void ) {
    clearBasePriorityFromISR();
 }
 
-/* 
-    sysTick中断函数
-    todo: 考虑将这个函数换个位置
-    todo: 将这个函数添加到中断向量表中，以便能够在中断时被正确调用
- */
-// void SysTick_Handler( void ) {
-//     if ( getSchedulerState() != SCHEDULER_STATE_WAITING ) {
-//         sysTickHandler();
-//     }
-// }
 
 /*
     确定一个最高ISR优先级，在这个ISR或者更低优先级的ISR中可以安全的调用以FromISR结尾的API函数

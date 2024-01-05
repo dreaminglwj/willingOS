@@ -9,7 +9,7 @@ void initWillingList( List_t * const list ) {
     list->itemNum = 0;
     list->head = NULL;
     list->tail = NULL;
-    list->current = NULL;
+    // list->current = NULL;
 }
 
 
@@ -72,25 +72,33 @@ UBase_t insertWillingList_Sort(  List_t * const list, ListItem_t * const item  )
 
 // UBase_t insertWillingList_Head( List_t * const list, ListItem_t * const item );
 UBase_t insertWillingList_Behind( List_t * const list, ListItem_t * const currentItem, ListItem_t * const item ) {
-    if ( currentItem == NULL || item == NULL || list == NULL ) {
+    if ( item == NULL || list == NULL ) {
         return 0;
     }
 
-    if ( currentItem->listWith != list ) {
-        return 0;
-    }
+     item->listWith = list;
 
-    item->next = currentItem->next;
-    item->previous = currentItem;
-    item->listWith = list;
+    if ( currentItem == NULL ) {
+        item->next = list->head;
+        item->previous = NULL;
+        list->head = item;
+    } else {
+        if ( currentItem->listWith != list ) {
+            return 0;
+        }
 
-    if ( item->next == NULL ) {
-        list->tail = item;
+        item->next = currentItem->next;
+        item->previous = currentItem;
+    
+        if ( item->next == NULL ) {
+            list->tail = item;
+        }
     }
 
     list->itemNum++;
     return list>itemNum;
 }
+
 
 UBase_t getWillingListItemNum( List_t * const list ) {
     if ( list == NULL ) {
@@ -101,40 +109,44 @@ UBase_t getWillingListItemNum( List_t * const list ) {
 }
 
 
-ListItem_t * getWillingListCurrentItem( List_t * const list ) {
-    if ( list == NULL ) {
-        return 0;
-    }
+// ListItem_t * getWillingListCurrentItem( List_t * const list ) {
+//     if ( list == NULL ) {
+//         return 0;
+//     }
 
-    if ( list->current == NULL ) {
-        list->current = list->head;
-    }
+//     if ( list->current == NULL ) {
+//         list->current = list->head;
+//     }
 
-    return list->current;
-}
+//     return list->current;
+// }
 
-ListItem_t * getWillingListNextItem( List_t * const list ) {
-    ListItem_t * currentItem = getWillingListCurrentItem(list);
-    if ( currentItem == NULL ) {
+ListItem_t * getWillingListNextItem( List_t * const list , ListItem_t * const item) {
+    if ( list == NULL || item == NULL || item->listWith != list ) {
         return NULL;
     }
 
-    return currentItem->next;
-
-    // list->current = currentItem->next;
-    // return list->current;
+    return item->next;
 }
 
-ListItem_t * getWillingListPreviousItem( List_t * const list ) {
-    ListItem_t * currentItem = getWillingListCurrentItem(list);
-    if ( currentItem == NULL ) {
+ListItem_t * getWillingListNextItem_Circle( List_t * const list, ListItem_t * const item ) {
+        if ( list == NULL || item == NULL || item->listWith != list ) {
         return NULL;
     }
 
-    return currentItem->previous;
+    if ( item->next == NULL ) {
+        return list->head;
+    }
 
-    // list->current = currentItem->previous;
-    // return list->current;
+    return item->next;
+}
+
+ListItem_t * getWillingListPreviousItem( List_t * const list, ListItem_t * const item ) {
+    if ( list == NULL || item == NULL || item->listWith != list ) {
+        return NULL;
+    }
+
+    return item->previous;
 }
 
 ListItem_t * getWillingListHeadItem( List_t * const list ) {
@@ -153,18 +165,51 @@ ListItem_t * getWillingListTailItem( List_t * const list ) {
     return list->tail;
 }
 
-ListItem_t * moveWillingListCursorNext( List_t * const list ) {
+// ListItem_t * moveWillingListCursorNext( List_t * const list ) {
 
-}
+// }
 
-ListItem_t * moveWillingListCursorPrevious( List_t * const list ) {
+// ListItem_t * moveWillingListCursorPrevious( List_t * const list ) {
 
-}
+// }
 
-ListItem_t * moveWillingListCursorTo( List_t * const list, ListItem_t * const item ) {
+// ListItem_t * moveWillingListCursorTo( List_t * const list, ListItem_t * const item ) {
 
-}
+// }
 
 UBase_t removeWillingListItem( List_t * const list, ListItem_t * const item ) {
+    if ( list == NULL || item == NULL || item->listWith != list ) {
+        return 0;
+    }
 
+//  只有一个元素的情况
+    if ( item->next == NULL || item->previous == NULL ) {
+        list->head = NULL;
+        list->tail = NULL;
+        list->itemNum = 0;
+        return list->itemNUm;
+    }
+
+// 删除tail
+    if ( item->next == NULL ) {
+        ListItem_t * previousItem = item->previous;
+        previousItem->next = NULL;
+        list->tail = previousItem;
+        list->itemNum--;
+        return list->itemNum;
+    }
+
+// 删除head
+    if ( item->previous == NULL ) {
+        list->head = item->next;
+        list->head->previous = NULL;
+        list->itemNum--;
+        item->next = NULL;
+       return list->itemNum;
+    }
+
+    item->previous->next = item->next;
+    item->next->previous = item->previous;
+    list->itemNum--;
+    return list->itemNum;
 }
