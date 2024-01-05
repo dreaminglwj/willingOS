@@ -352,12 +352,6 @@ UBase_t resumeScheduler(void) {
 
 
 void processDelay( void ) {
-    // tickCount++;
-    // if ( tickCount == 0 ) {
-    //     tickCountSession = !tickCountSession;
-    // }
-
-    // todo:  处理suspend队列，如果有定时时间到的任务，移动到就绪队列
     ListItem_t * item = getWillingListHeadItem(&suspendTaskList);
     TCB_t * tcb = NULL;
     if ( item == NULL ) {
