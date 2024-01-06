@@ -21,23 +21,16 @@ void sharling(void) {
 	led1Stat = led1Stat;
 }
 
+
 void lightLed1( void *param ) {
-    // uint32_t count = 0;
     while (1)
     {
-    //     count++;
-    //     if (count >= countMax) {
-    //         count = 0;
-    //         led1Stat = !led1Stat;
-    //     }
-    //    LED1 = led1Stat;
         led1Stat = !led1Stat;
         LED1 = led1Stat;
-        willingSleep_ms(5000);
-        //led1Stat = !led1Stat;
-        //LED1 = led1Stat;
+        willingSleep_ms(500);
     }
 }
+
 
 void lightLed2( void *param ) {
     // uint32_t count = 0;

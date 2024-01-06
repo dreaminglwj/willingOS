@@ -192,36 +192,69 @@ static void addTaskToReadyArray( TCB_t * tcb ) {
 */
 Base_t sysTickService( void ) {
     Base_t needSwitchCtx = wFALSE;
+			ListItem_t * itemToRun = NULL;
+			ListItem_t * itemItr = readyTaskList.head;
+			Base_t currentTCBAlive = wFALSE; // 当前任务是否在就绪表中
+	
     willingAssert( readyTaskList.itemNum );
-
-    if (  readyTaskList.itemNum == 1 && readyTaskList.head->tcbWith == currentTCB )  {
-        needSwitchCtx = wFALSE;
-    } else {
-        // 查找优先级大于等于当前任务的tcb，找到则切换
-        // todo: 优化效率，遍历链表太慢了
-        ListItem_t * item = readyTaskList.head;
-			  TCB_t * tcbWith = (TCB_t *)(item->tcbWith);
-        if ( tcbWith != currentTCB && tcbWith->priority >= currentTCB->priority ) {
-                nextTaskItem = item;
+	
+	/* if (就绪表只有一个任务) {
+	      if ( 就绪表中的任务 不等于 当前任务 ) {
+	           说明当前任务被挂起了，所以需要进行调度，切换到idle任务
         } else {
-            while (1) {
-                item = getWillingListNextItem( &readyTaskList, item );
-                if ( item == NULL ) {
-                    needSwitchCtx = wFALSE;
-                    break;
-                } 
-								tcbWith = (TCB_t *)(item->tcbWith);
-
-                if ( tcbWith != currentTCB &&  tcbWith->priority >= currentTCB->priority ) {
-                    nextTaskItem = item;
-                    needSwitchCtx = wTRUE;
-                    break;
-                }
-
-                //  todo：对于多次tick的都没有被调用的任务，进行优先级提升
-            } 
+	           不需要进行调度
         }
-    }
+	   } else {  就绪表中有多个任务的时候
+      	if ( 当前任务不在就绪表中 ) {
+	         切换
+        } else { 当前任务在就绪表中
+           if ( 有优先级大于等于当前任务的任务存在 ) {
+							切换
+           } else {
+	            不切换
+           }
+	      }
+     }
+	
+	
+	   优化一下：
+		 if ( 当前任务在就绪表中 ) {
+		     if ( 存在优先级  大于等于  当前任务的任务 ) {
+				     切换
+			   }
+	   } else { 当前任务不在就绪表中
+		     切换
+	   }
+		 
+		 其他：不切换
+	*/
+
+			do {
+				TCB_t * tcbItr = (TCB_t *)(itemItr->tcbWith);
+				
+				if ( tcbItr == currentTCB ) {
+					currentTCBAlive = wTRUE;
+				} else {
+					if ( itemToRun == NULL && tcbItr->priority >= currentTCB->priority ) {
+						itemToRun = itemItr;
+					}
+				}
+				
+				//  todo：对于多次tick的都没有被调用的任务，进行优先级提升
+				
+				itemItr = itemItr->next;
+			} while( itemItr != NULL );
+			
+			if ( currentTCBAlive == wTRUE ) {
+				if ( itemToRun != NULL ) {
+					nextTaskItem = itemToRun;
+					needSwitchCtx = wTRUE;
+				}
+			} else {
+				nextTaskItem = readyTaskList.head;
+				needSwitchCtx = wTRUE;
+			}
+			
 
     return needSwitchCtx;
 }
@@ -280,7 +313,7 @@ void OSStart(void) {
 // idleTask，由于优先级比较低，所以当有其他任务的时候，idletask是不会被执行的
     createTask( (TaskFunc_t) idleTask,
             (const char *) "idleTask",
-            (uint32_t  ) 50,
+            (uint32_t  ) 20,
             (void *) NULL,
             (UBase_t) MIN_PRIORITY_VALUE,
             (TaskHandle_t *) idleTaskHandler);
@@ -354,30 +387,23 @@ UBase_t resumeScheduler(void) {
 }
 
 
+
+
+
+
 void processDelay( void ) {
     ListItem_t * item = getWillingListHeadItem(&suspendTaskList);
     TCB_t * tcb = NULL;
-    if ( item == NULL ) {
-        return;
-    }
-
-    tcb = item->tcbWith;
-    if ( tcb->tickCountSession == tickCountSession && tcb->delayExpireAt <= tickCount  ) {
-        removeWillingListItem( &suspendTaskList, item );
-        insertWillingList_Head( &readyTaskList, item );
-    }
-
-    for (;;) {
-        item = getWillingListNextItem(&suspendTaskList,item);
-        if ( item == NULL ) {
-            break;
-        }
-         tcb = item->tcbWith;
+	
+		while( item != NULL ) {
+		    tcb = item->tcbWith;
         if ( tcb->tickCountSession == tickCountSession && tcb->delayExpireAt <= tickCount  ) {
             removeWillingListItem( &suspendTaskList, item );
             insertWillingList_Head( &readyTaskList, item );
         }
-    }
+				
+				item = getWillingListNextItem(&suspendTaskList,item);
+		}
 }
 
 void initKernel( void ) {

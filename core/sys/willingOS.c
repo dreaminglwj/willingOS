@@ -25,7 +25,6 @@ void initNVICPriorityGroup(uint32_t priorityGroup) {
 
 
 void willingStart(OSErr *err) {
-    initKernel();
     OSStart();
 }
 

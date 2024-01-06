@@ -63,10 +63,12 @@ UBase_t insertWillingList_Sort(  List_t * const list, ListItem_t * const item  )
 }
 
 
-UBase_t insertWillingList_End( List_t * const list, ListItem_t * const item ) {
+UBase_t insertWillingList_Tail( List_t * const list, ListItem_t * const item ) {
     if ( list == NULL || item == NULL ) {
         return 0;
     }
+		
+		item->listWith = list;
 
     if ( list->tail == NULL ) {
         list->head = item;
@@ -86,12 +88,14 @@ UBase_t insertWillingList_Head( List_t * const list, ListItem_t * const item ) {
     if ( list == NULL || item == NULL ) {
         return 0;
     }
+		item->listWith = list;
 
     if ( list->head == NULL ) {
         list->head = item;
         list->tail = item;
+			  item->next = NULL;
     } else {
-        item->next = list->head->next;
+        item->next = list->head;
         list->head = item;
     }
 
@@ -109,23 +113,27 @@ UBase_t insertWillingList_Behind( List_t * const list, ListItem_t * const curren
      item->listWith = list;
 
     if ( currentItem == NULL ) {
-        item->next = list->head;
-        item->previous = NULL;
-        list->head = item;
+			insertWillingList_Head( list, item );
+//        item->next = list->head;
+//        item->previous = NULL;
+//        list->head = item;
     } else {
         if ( currentItem->listWith != list ) {
             return 0;
         }
 
         item->next = currentItem->next;
+				currentItem->next = item;
         item->previous = currentItem;
     
         if ( item->next == NULL ) {
             list->tail = item;
         }
+				
+				list->itemNum++;
     }
 
-    list->itemNum++;
+    
     return list->itemNum;
 }
 
@@ -213,10 +221,12 @@ UBase_t removeWillingListItem( List_t * const list, ListItem_t * const item ) {
     }
 
 //  只有一个元素的情况
-    if ( item->next == NULL || item->previous == NULL ) {
+    if ( item->next == NULL && item->previous == NULL ) {
         list->head = NULL;
         list->tail = NULL;
         list->itemNum = 0;
+					item->next = NULL;
+		item->previous = NULL;
         return list->itemNum;
     }
 
@@ -226,6 +236,8 @@ UBase_t removeWillingListItem( List_t * const list, ListItem_t * const item ) {
         previousItem->next = NULL;
         list->tail = previousItem;
         list->itemNum--;
+					item->next = NULL;
+		item->previous = NULL;
         return list->itemNum;
     }
 
@@ -235,11 +247,14 @@ UBase_t removeWillingListItem( List_t * const list, ListItem_t * const item ) {
         list->head->previous = NULL;
         list->itemNum--;
         item->next = NULL;
+		item->previous = NULL;
        return list->itemNum;
     }
-
+// 删除中间
     item->previous->next = item->next;
     item->next->previous = item->previous;
     list->itemNum--;
+		item->next = NULL;
+		item->previous = NULL;
     return list->itemNum;
 }
