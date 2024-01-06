@@ -33,9 +33,9 @@ void lightLed1( void *param ) {
     //    LED1 = led1Stat;
         led1Stat = !led1Stat;
         LED1 = led1Stat;
-        willingSleep_ms(500);
-        led1Stat = !led1Stat;
-        LED1 = led1Stat;
+        willingSleep_ms(5000);
+        //led1Stat = !led1Stat;
+        //LED1 = led1Stat;
     }
 }
 
@@ -52,8 +52,8 @@ void lightLed2( void *param ) {
         led2Stat = !led2Stat;
         LED2 = led2Stat;
         willingSleep_ms(500);
-        led2Stat = !led2Stat;
-        LED2 = led2Stat;
+        //led2Stat = !led2Stat;
+        //LED2 = led2Stat;
     }
 }
 

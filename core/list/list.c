@@ -1,4 +1,4 @@
-#include "lsit.h"
+#include "list.h"
 
 
 void initWillingList( List_t * const list ) {
@@ -15,6 +15,8 @@ void initWillingList( List_t * const list ) {
 
 UBase_t insertWillingList_Sort(  List_t * const list, ListItem_t * const item  ){
     UBase_t itemNums = 0;
+	  ListItem_t * nextItem = NULL;
+	ListItem_t * currentItem = NULL;
     /* 判断参数的代码在这个级别上来说不一定有用，一是降低了效率，
     二是系统级别的代码如果参数都存在问题，是不可想象的
     三是变量在分配内存后不必要立即进行初始化，因此tcbWith可能是无效的任意值不一定为NULL */
@@ -22,7 +24,7 @@ UBase_t insertWillingList_Sort(  List_t * const list, ListItem_t * const item  )
         return 0;
     }
 
-    ListItem_t * currentItem = list->head;
+    currentItem = list->head;
     if ( currentItem == NULL ) {
         list->head = item;
         list->tail = item;
@@ -56,7 +58,7 @@ UBase_t insertWillingList_Sort(  List_t * const list, ListItem_t * const item  )
     }
     
     /* 插入 */
-    itemNums = insertWillingList_Hehind( list, currentItem, item );
+    itemNums = insertWillingList_Behind( list, currentItem, item );
     return itemNums;
 }
 
@@ -124,7 +126,7 @@ UBase_t insertWillingList_Behind( List_t * const list, ListItem_t * const curren
     }
 
     list->itemNum++;
-    return list>itemNum;
+    return list->itemNum;
 }
 
 
@@ -215,7 +217,7 @@ UBase_t removeWillingListItem( List_t * const list, ListItem_t * const item ) {
         list->head = NULL;
         list->tail = NULL;
         list->itemNum = 0;
-        return list->itemNUm;
+        return list->itemNum;
     }
 
 // 删除tail

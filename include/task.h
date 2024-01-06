@@ -11,16 +11,22 @@ typedef void * TaskHandle_t;
 #define SCHEDULER_STATE_WAITING    ( ( Base_t ) 1 )
 #define SCHEDULER_STATE_RUNNING      ( ( Base_t ) 2 )
 
+extern volatile Base_t schedulerRunning;
+extern volatile Base_t schedulerSuspended;
+extern volatile uint32_t tickCount;
+extern volatile uint8_t  tickCountSession;
+
 
 Base_t sysTickService( void );
 Base_t getSchedulerState( void );
 void taskSwitchContext( void );
 void OSStart(void);
 void OSStop(void);
-void willingSleep_ms( uint_32 n ); // 单位ms
+void willingSleep_ms( uint32_t n ); // 单位ms
 void suspendScheduler(void);
 UBase_t resumeScheduler(void);
 void processDelay( void );
+void initKernel( void );
 
 Long_t createTask( TaskFunc_t taskFunc, /* 任务函数 */ 
                     const char* const taskName,  /* 任务名称 */ 

@@ -26,10 +26,11 @@ typedef struct taskControlBlock {
 /* 重新定义一个tcb变量，供编程使用 */
 typedef TCB TCB_t;
 
-static volatile Base_t schedulerRunning = wFALSE;
-static volatile Base_t schedulerSuspended = 0;
-static volatile uint32_t tickCount      = 0U;
-static volatile uint8_t  tickCountSession = 0U;
+// todo：因为在port中用到了这些变量，暂时只能导出去，等调试通过了再来整理，还原成static
+/*static*/ volatile Base_t schedulerRunning = wFALSE;
+/*static*/ volatile Base_t schedulerSuspended = 0;
+/*static*/ volatile uint32_t tickCount      = 0U;
+/*static*/ volatile uint8_t  tickCountSession = 0U;
 
 
 /* 任务队列 */
@@ -171,7 +172,7 @@ static void initTask( TaskFunc_t taskFunc,
 
 /* 用于测试任务调度，暂时未加临界区，当三个任务都加入到数组后开启调度器 */
 static void addTaskToReadyArray( TCB_t * tcb ) {
-
+		UBase_t nums = 0;
     ListItem_t * item = ( ListItem_t *  ) willingMalloc(  sizeof(ListItem_t)  );
     item->tcbWith = tcb;
     item->listWith = &readyTaskList;
@@ -180,7 +181,7 @@ static void addTaskToReadyArray( TCB_t * tcb ) {
     willingAssert( nums );
 
     if ( currentTCB == NULL ) {
-        currentItem = item;
+        currentTaskItem = item;
         currentTCB = tcb;
     }
 }
@@ -199,7 +200,8 @@ Base_t sysTickService( void ) {
         // 查找优先级大于等于当前任务的tcb，找到则切换
         // todo: 优化效率，遍历链表太慢了
         ListItem_t * item = readyTaskList.head;
-        if ( item->tcbWith != currentTCB &&  item->tcbWith->priority >= currentTCB->priority ) {
+			  TCB_t * tcbWith = (TCB_t *)(item->tcbWith);
+        if ( tcbWith != currentTCB && tcbWith->priority >= currentTCB->priority ) {
                 nextTaskItem = item;
         } else {
             while (1) {
@@ -208,8 +210,9 @@ Base_t sysTickService( void ) {
                     needSwitchCtx = wFALSE;
                     break;
                 } 
+								tcbWith = (TCB_t *)(item->tcbWith);
 
-                if ( item->tcbWith != currentTCB &&  item->tcbWith->priority >= currentTCB->priority ) {
+                if ( tcbWith != currentTCB &&  tcbWith->priority >= currentTCB->priority ) {
                     nextTaskItem = item;
                     needSwitchCtx = wTRUE;
                     break;
@@ -298,7 +301,7 @@ void OSStop(void) {
 }
 
 // 单位ms
-void willingSleep_ms( uint_32 n ) {
+void willingSleep_ms( uint32_t n ) {
     uint32_t ticks = ( n * SYS_TICK_RATE ) / 1000; // n / ( 1000 / SYS_TICK_RATE )
     UBase_t rlt = 0;
 
@@ -331,23 +334,23 @@ void willingSleep_ms( uint_32 n ) {
 
 
 void suspendScheduler(void) {
-    ++suspendScheduler;
+    ++schedulerSuspended;
 }
 
 
 UBase_t resumeScheduler(void) {
-    if ( suspendScheduler > 0 ) {
-        --suspendScheduler;
+    if ( schedulerSuspended > 0 ) {
+        --schedulerSuspended;
     }
 
-    if ( suspendScheduler == 0 ) { // 开启调度
+    if ( schedulerSuspended == 0 ) { // 开启调度
         //  产生一个PendSV中断
-        willingAssert( sysTickService() == wTRUE )
+        willingAssert( sysTickService() == wTRUE );
             
         NVIC_INTERRUPUT_CTRL_REG = NVIC_PENDSV_SET_BIT;
     }
 
-    return suspendScheduler;
+    return schedulerSuspended;
 }
 
 
@@ -365,7 +368,7 @@ void processDelay( void ) {
     }
 
     for (;;) {
-        item = getWillingListNextItem(&suspendTaskList);
+        item = getWillingListNextItem(&suspendTaskList,item);
         if ( item == NULL ) {
             break;
         }
@@ -375,4 +378,17 @@ void processDelay( void ) {
             insertWillingList_Head( &readyTaskList, item );
         }
     }
+}
+
+void initKernel( void ) {
+    readyTaskList.head = NULL;
+    readyTaskList.tail = NULL;
+    readyTaskList.itemNum = 0;
+
+    suspendTaskList.head = NULL;
+    suspendTaskList.tail = NULL;
+    suspendTaskList.itemNum = 0;
+
+    tickCountSession = 0;
+    tickCount = 0;
 }

@@ -8,8 +8,8 @@
 #endif
 
 typedef struct  willingListItem {
-    willingListItem * LIST_VOLATILE next; /* 下一个元素 */
-    willingListItem * LIST_VOLATILE previous;/* 上一个元素 */
+    struct willingListItem * LIST_VOLATILE next; /* 下一个元素 */
+    struct willingListItem * LIST_VOLATILE previous;/* 上一个元素 */
     void * tcbWith; /* 本item所属tcb */
     void * LIST_VOLATILE listWith; /*  */
     UBase_t sortValue; /* 用于排序 */
@@ -42,7 +42,5 @@ ListItem_t * getWillingListTailItem( List_t * const list );
 // ListItem_t * moveWillingListCursorPrevious( List_t * const list );
 // ListItem_t * moveWillingListCursorTo( List_t * const list, ListItem_t * const item );
 UBase_t removeWillingListItem( List_t * const list, ListItem_t * const item );
-
-
 
 #endif

@@ -427,6 +427,11 @@
               <FileType>5</FileType>
               <FilePath>..\include\WillingOSConfig.h</FilePath>
             </File>
+            <File>
+              <FileName>list.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\include\list.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -514,6 +519,16 @@
               <FileName>led.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\app\led\led.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>list</GroupName>
+          <Files>
+            <File>
+              <FileName>list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\core\list\list.c</FilePath>
             </File>
           </Files>
         </Group>

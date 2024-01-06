@@ -30,18 +30,7 @@ void willingStart(OSErr *err) {
 }
 
 
-void initKernel( void ) {
-    readyTaskList.head = NULL;
-    readyTaskList.tail = NULL;
-    readyTaskList.itemNum = 0;
 
-    suspendTaskList.head = NULL;
-    suspendTaskList.tail = NULL;
-    suspendTaskList.itemNum = 0;
-
-    tickCountSession = 0;
-    tickCount = 0;
-}
 
 
 
