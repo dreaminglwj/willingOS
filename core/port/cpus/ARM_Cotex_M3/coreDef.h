@@ -156,6 +156,7 @@ typedef unsigned long UBase_t;
 
 /* 任务相关 */
 typedef void (*TaskFunc_t)(void *);
+typedef void (*TimerCmdFunc_t)(void *);
 
 static UBase_t criticalNesting = 0xaaaaaaaa;
 

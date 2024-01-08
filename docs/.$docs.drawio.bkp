@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-01-07T12:28:05.319Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="HuRh-ohKe1D8yUT7g_mm" version="22.1.11" type="device" pages="3">
+<mxfile host="Electron" modified="2024-01-07T12:28:19.588Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="cKQdDwyHPWno5JNHF-lv" version="22.1.11" type="device" pages="3">
   <diagram name="内存模型" id="tkiIFqFKKDN445kTAdoN">
     <mxGraphModel dx="1026" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="800" pageHeight="500" math="0" shadow="0">
       <root>
@@ -149,6 +149,9 @@
         </mxCell>
         <mxCell id="qz8KxxSNf42YU-MQiJRx-5" value="timer原理" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="190" y="130" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qz8KxxSNf42YU-MQiJRx-6" value="移植原理" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="180" y="330" width="60" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

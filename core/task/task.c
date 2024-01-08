@@ -222,7 +222,7 @@ Base_t sysTickService( void ) {
 		     if ( 存在优先级  大于等于  当前任务的任务 ) {
 				     切换
 			   }
-	   } else { 当前任务不在就绪表中
+	   } else { 当前任务不在就绪表中，这种情况一般是因为调用了sleep函数
 		     切换
 	   }
 		 
@@ -333,38 +333,75 @@ void OSStop(void) {
 
 }
 
+uint8_t calculateTickCount_ms( uint32_t nms, uint32_t * ticksWait ) {
+    uint32_t ticks = ( n * SYS_TICK_RATE ) / 1000; 
+    uint6_t   session = tickCountSession;
+    if ( waitTicks == NULL ) {
+        return 0
+    }
+
+    *ticksWait = tickCount + ticks;
+    if ( ticksWait < tickCount ) {
+        session != tickCountSession;
+    } 
+
+    return session;
+}
+
 // 单位ms
 void willingSleep_ms( uint32_t n ) {
-    uint32_t ticks = ( n * SYS_TICK_RATE ) / 1000; // n / ( 1000 / SYS_TICK_RATE )
+    // uint32_t ticks = ( n * SYS_TICK_RATE ) / 1000; // n / ( 1000 / SYS_TICK_RATE )
+    uint32_t ticks = 0;
+    uint6_t session = 0;
     UBase_t rlt = 0;
 
+    // suspendScheduler();
+
+    session = calculateTickCount_ms( n,  &ticks );
+
+    willingSleep_ticks( ticks, session );
+
+//     // currentTCB->delayExpireAt = tickCount + ticks;
+//     // if ( currentTCB->delayExpireAt < tickCount ) {
+//     //     currentTCB->tickCountSession = !tickCountSession;
+//     // } else {
+//     //     currentTCB->tickCountSession = tickCountSession;
+//     // }
+
+//     currentTaskItem->sortValue = currentTCB->delayExpireAt;
+//     currentTaskItem->tickCountSession = currentTCB->tickCountSession;
+
+// //  todo: 存在风险，可能会跳过下一个任务，要去看看switch函数怎么实现的，什么时候调用的
+// // 当就绪列表中没有任务的时候应该插入一个idleTask
+// //    ListItem_t * next = getWillingListNextItem_Circle( &readyTaskList, currentTaskItem );
+// //    if ( next == NULL ) {
+// //       /* todo: 插入一个idleTask，或者在初始化的时候插入一个，但是要保证这个任务不占cpu时间 */
+// //    }
+     
+//     removeWillingListItem( &readyTaskList, currentTaskItem );
+//     rlt = insertWillingList_SortASC( &suspendTaskList,  currentTaskItem );
+//     willingAssert(rlt);
+//     // currentTaskItem = next;
+
+    // resumeScheduler();
+}
+
+
+void willingSleep_ticks( int32_t ticks, uint8_t session ) {
     suspendScheduler();
 
-    currentTCB->delayExpireAt = tickCount + ticks;
-    if ( currentTCB->delayExpireAt < tickCount ) {
-        currentTCB->tickCountSession = !tickCountSession;
-    } else {
-        currentTCB->tickCountSession = tickCountSession;
-    }
+    currentTCB->tickCountSession = session；
+    currentTCB->delayExpireAt = ticks;
 
     currentTaskItem->sortValue = currentTCB->delayExpireAt;
     currentTaskItem->tickCountSession = currentTCB->tickCountSession;
-
-//  todo: 存在风险，可能会跳过下一个任务，要去看看switch函数怎么实现的，什么时候调用的
-// 当就绪列表中没有任务的时候应该插入一个idleTask
-//    ListItem_t * next = getWillingListNextItem_Circle( &readyTaskList, currentTaskItem );
-//    if ( next == NULL ) {
-//       /* todo: 插入一个idleTask，或者在初始化的时候插入一个，但是要保证这个任务不占cpu时间 */
-//    }
      
     removeWillingListItem( &readyTaskList, currentTaskItem );
-    rlt = insertWillingList_Sort( &suspendTaskList,  currentTaskItem );
+    rlt = insertWillingList_SortASC( &suspendTaskList,  currentTaskItem );
     willingAssert(rlt);
-    // currentTaskItem = next;
 
     resumeScheduler();
 }
-
 
 void suspendScheduler(void) {
     ++schedulerSuspended;
@@ -376,7 +413,7 @@ UBase_t resumeScheduler(void) {
         --schedulerSuspended;
     }
 
-    if ( schedulerSuspended == 0 ) { // 开启调度
+    if ( schedulerSuspended == 0 ) { // 开启调度，保证函数可重入
         //  产生一个PendSV中断
         willingAssert( sysTickService() == wTRUE );
             

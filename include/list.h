@@ -27,7 +27,7 @@ typedef struct willingList {
 
 
 void initWillingList( List_t * const list );
-UBase_t insertWillingList_Sort(  List_t * const list, ListItem_t * const item  );
+UBase_t insertWillingList_SortASC(  List_t * const list, ListItem_t * const item  );
 UBase_t insertWillingList_Tail( List_t * const list, ListItem_t * const item );
 UBase_t insertWillingList_Head( List_t * const list, ListItem_t * const item );
 UBase_t getWillingListItemNum( List_t * const list );

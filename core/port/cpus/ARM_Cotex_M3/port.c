@@ -162,34 +162,55 @@ void exitCriticalSection( void ) {
     }
 }
 
-/* 用于启动第一个任务 */
+/* 用于启动第一个任务 
+ 恢复currentTCB，currentTCB 指下一个会被调用的任务；
+ 获取topOfStack，即当前任务的栈顶地址；
+在createTask的时候，需要模拟的 Cortex 的异常入栈顺序，做好数据初始化；
+
+使用 LDMIA 指令，以 topOfStack 开始顺序出栈，先恢复R4~R11，同时 R0 递增；
+
+将 R0 赋值给 PSP（因为出栈的时候，处理器会按照入栈的顺序去取 R4-R11、R14，而这些寄存器在我们创建任务的时候已经手动压栈）
+
+将 BASEPRI 寄存器赋值为 0，即允许任何中断
+
+最后执行 bx R14，告诉处理器 ISR 完成，需要返回，此刻处理器便会进行出栈操作，PC 被我们赋值成为了执行任务的函数的入口，任务正式跑起来；
+*/
 __asm void SVCHandler( void ) {
 	PRESERVE8
 
-	ldr	r3, =currentTCB	/* Restore the context. */
-	ldr r1, [r3]			/* Use pxCurrentTCBConst to get the pxCurrentTCB address. */
-	ldr r0, [r1]			/* The first item in pxCurrentTCB is the task top of stack. */
-	ldmia r0!, {r4-r11}		/* Pop the registers that are not automatically saved on exception entry and the critical nesting count. */
-	msr psp, r0				/* Restore the task stack pointer. */
+	ldr	r3, =currentTCB	/* 恢复currentPCB. */
+	ldr r1, [r3]			/* 根据 currentTCB 获取到对应 taskTCB的地址. */
+	ldr r0, [r1]			/* 获取第一个成员变量stack,即当前任务的栈顶地址. */
+	ldmia r0!, {r4-r11}		/* 使用 LDMIA 指令，以 topOfStack 开始顺序出栈，先恢复 R4~R11，同时 R0 递增；*/
+	msr psp, r0				/* 将 R0 赋值给 PSP（因为出栈的时候，处理器会按照入栈的顺序去取 R4-R11、R14，而这些寄存器在我们创建任务的时候已经手动压栈） */
 	isb
 	mov r0, #0
-	msr	basepri, r0
+	msr	basepri, r0 
 	orr r14, #0xd
 	bx r14
 	nop
 }
 
+/*
+取 MSP 的初始值：先根据向量表的位置寄存器 VTOR (0xE000ED08) 来获取向量表存储的地址；
+ 再根据向量表存储的地址，取出第一个元素__initial_sp，写入 MSP；
+ Cortex-M3 处理器，上电默认进入线程的特权模式，因此使用 MSP 作为堆栈指针;
+ 程序从上电开始运行到这里，经过一系列的函数调用，MSP 已经不是最开始初始化的位置；
+所以通过 MSR 重新初始化 MSP，丢弃主堆栈中的数据； 当然，这是一条不归路，代码跑到这里，不会再返回之前的调用路径。
+最后调用 svc 并传入系统调用号为 0 启动 SVC 中断
+
+*/
 
 __asm void startFirstTask( void ) {
 	PRESERVE8
 
 	/* Use the NVIC offset register to locate the stack. */
-	ldr r0, =0xE000ED08
-	ldr r0, [r0]
-	ldr r0, [r0]
+	ldr r0, =0xE000ED08  // 0xE000ED08 地址处为VTOR（向量偏移量）寄存器，存储向量表起始地址
+	ldr r0, [r0] // 启动文件中，最初地址存在的__initial_sp
+	ldr r0, [r0] // 根据向量表实际存储地址，取出向量表中的第一项，向量表第一项存储主堆栈指针MSP的初始值
 
 	/* Set the msp back to the start of the stack. */
-	msr msp, r0
+	msr msp, r0 // 将__initial_sp的初始值写入MSP中
 	/* Globally enable interrupts. */
 	cpsie i
 	cpsie f

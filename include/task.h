@@ -22,6 +22,7 @@ Base_t getSchedulerState( void );
 void taskSwitchContext( void );
 void OSStart(void);
 void OSStop(void);
+uint8_t calculateTickCount_ms( uint32_t nms, uint32_t * ticksWait );
 void willingSleep_ms( uint32_t n ); // 单位ms
 void suspendScheduler(void);
 UBase_t resumeScheduler(void);
