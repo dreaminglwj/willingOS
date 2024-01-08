@@ -3,6 +3,7 @@
 
 #define MAX_TASK_NAME_LEN (16) 
 #define MAX_PRIORITY_NUM  (32)
+#define MAX_PRIORITY_VALUE (31)
 #define MIN_PRIORITY_VALUE (0)
 #define SUGGESTED_PRIORITY (20)
 #define MAX_TASK_NUM (3)

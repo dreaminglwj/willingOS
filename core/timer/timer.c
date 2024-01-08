@@ -59,7 +59,7 @@ void timerTask(void * param) {
     ListItem_t * cmdItem = timerCmdList.head;
     TimerCommand_t * timerCmd = NULL; 
     for(;;) {
-        if( timerCmdList.itemNum == 0 ) {
+        if( cmdItem == NULL ) {
             willingSleep_ms( TIMER_IDLE_DELAY_VALUE );
         } else {
             willingAssert( cmdItem );
@@ -76,12 +76,16 @@ void timerTask(void * param) {
                 if ( timeOutAt < timerCmd->timeOutAt ) {
                     timerCmd->tickCountSession = !(timerCmd->tickCountSession)
                     timerCmd->timeOutAt = timeOutAt;
+                    cmdItem->sortValue = timeOutAt;
+                    cmdItem->tickCountSession = timerCmd->tickCountSession;
                 }
 
-                cmdItem->
+                willingAssert( insertWillingList_SortASC( &timerCmdList, cmdItem ) );
             }
 
             resumeScheduler();
+
+            cmdItem = timerCmdList.head;
         }
     }
 }
@@ -101,8 +105,8 @@ void processTimerCmd( void ) {
 }
 
 
-void readjustTimerTaskWaitTime( uint32_t timeOutAt, uint32_t tickCountSession ) {
-    // 查找
+void readjustTimerTaskWaitTime( uint32_t timeOutAt, uint32_t tickSession ) {
+    reassignTimerTaskExpireTime( timeOutAt, tickSession )
 }
   
 

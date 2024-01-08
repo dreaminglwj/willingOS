@@ -8,6 +8,7 @@
 #include "memory.h"
 #include "protable.h"
 #include "list.h"
+#include "timer.h"
 
 
 typedef struct taskControlBlock {
@@ -48,6 +49,9 @@ ListItem_t * nextTaskItem = NULL; /* 在sysTickService中确定要不要调度�
                                                         避免在switch的时候再来遍历链表。
                                                         todo：测试会不会产生调度之前又发生变化的问题 */
 TaskHandle_t idleTaskHandler;
+TaskHandle_t timerTaskHandler;
+ListItem_t * timerTaskItem;
+
 
 
 
@@ -308,9 +312,22 @@ void idleTask(void * param) {
 }
 
 void OSStart(void) {
+    
     DISABLE_INTERRUPTS();
 
-// idleTask，由于优先级比较低，所以当有其他任务的时候，idletask是不会被执行的
+
+
+    createTask( (TaskFunc_t) timerTask,
+            (const char *) "timerTask",
+            (uint32_t  ) 20,
+            (void *) NULL,
+            (UBase_t) MAX_PRIORITY_VALUE,
+            (TaskHandle_t *) timerTaskHandler);
+
+    timerTaskItem = readyTaskList.tail;
+    
+
+    // idleTask，由于优先级比较低，所以当有其他任务的时候，idletask是不会被执行的
     createTask( (TaskFunc_t) idleTask,
             (const char *) "idleTask",
             (uint32_t  ) 20,
@@ -327,6 +344,14 @@ void OSStart(void) {
     } else {
 
     }
+}
+
+void reassignTimerTaskExpireTime( uint32_t expireAt, uint6_t tickSession ) {
+    timerTaskItem->sortValue = expireAt;
+    timerTaskItem->tickCountSession = tickSession;
+    TCB_t * timerTCB = (TCB_t*) timerTaskHandler;
+    timerTCB->delayExpireAt = expireAt;
+    timerTCB->tickCountSession = tickSession;
 }
 
 void OSStop(void) {
@@ -403,6 +428,8 @@ void willingSleep_ticks( int32_t ticks, uint8_t session ) {
     resumeScheduler();
 }
 
+
+
 void suspendScheduler(void) {
     ++schedulerSuspended;
 }
@@ -443,6 +470,8 @@ void processDelay( void ) {
 		}
 }
 
+void 
+
 void initKernel( void ) {
     readyTaskList.head = NULL;
     readyTaskList.tail = NULL;
@@ -454,4 +483,6 @@ void initKernel( void ) {
 
     tickCountSession = 0;
     tickCount = 0;
+
+    timerTaskItem = NULL;
 }
