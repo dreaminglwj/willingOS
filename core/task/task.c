@@ -250,7 +250,7 @@ Base_t sysTickService( void ) {
 			} while( itemItr != NULL );
 			
 			if ( currentTCBAlive == wTRUE ) {
-				if ( itemToRun != NULL ) {
+				if ( itemToRun != NULL ) { // todo： 这里适配了sleep的情况？对于timer的情况，这里判断不对，因为timer没有被挂起，所以所alive的，进来之后itemToRun为空，导致认为不需要调度，函数退出后assert失败，所以可能不需要assert
 					nextTaskItem = itemToRun;
 					needSwitchCtx = wTRUE;
 				}
@@ -305,8 +305,8 @@ void taskSwitchContext( void ) {
 
 void idleTask(void * param) {
 	while(1) {
-		int i = 0; // 用于调试
-		i=1;
+//		int i = 0; // 用于调试
+//		i=1;
 		;
 	}
 }
@@ -346,12 +346,15 @@ void OSStart(void) {
     }
 }
 
-void reassignTimerTaskExpireTime( uint32_t expireAt, uint6_t tickSession ) {
+void reassignTimerTaskExpireTime( uint32_t expireAt, uint8_t tickSession ) {
+	if( timerTaskHandler != NULL ) { // 有可能在创建timer的时候timerTask还没有启动，所以需要在创建timerTask的时候去检查时间最小的timer
+			TCB_t * timerTCB = (TCB_t*) timerTaskHandler;
     timerTaskItem->sortValue = expireAt;
     timerTaskItem->tickCountSession = tickSession;
-    TCB_t * timerTCB = (TCB_t*) timerTaskHandler;
+    
     timerTCB->delayExpireAt = expireAt;
     timerTCB->tickCountSession = tickSession;
+	}
 }
 
 void OSStop(void) {
@@ -359,15 +362,15 @@ void OSStop(void) {
 }
 
 uint8_t calculateTickCount_ms( uint32_t nms, uint32_t * ticksWait ) {
-    uint32_t ticks = ( n * SYS_TICK_RATE ) / 1000; 
-    uint6_t   session = tickCountSession;
-    if ( waitTicks == NULL ) {
-        return 0
+    uint32_t ticks = ( nms * SYS_TICK_RATE ) / 1000; 
+    uint8_t   session = tickCountSession;
+    if ( ticksWait == NULL ) {
+        return 0;
     }
 
     *ticksWait = tickCount + ticks;
-    if ( ticksWait < tickCount ) {
-        session != tickCountSession;
+    if ( *ticksWait < tickCount ) {
+        session = !tickCountSession;
     } 
 
     return session;
@@ -377,8 +380,8 @@ uint8_t calculateTickCount_ms( uint32_t nms, uint32_t * ticksWait ) {
 void willingSleep_ms( uint32_t n ) {
     // uint32_t ticks = ( n * SYS_TICK_RATE ) / 1000; // n / ( 1000 / SYS_TICK_RATE )
     uint32_t ticks = 0;
-    uint6_t session = 0;
-    UBase_t rlt = 0;
+    uint8_t session = 0;
+    // UBase_t rlt = 0;
 
     // suspendScheduler();
 
@@ -412,10 +415,12 @@ void willingSleep_ms( uint32_t n ) {
 }
 
 
-void willingSleep_ticks( int32_t ticks, uint8_t session ) {
+void willingSleep_ticks( int32_t ticks, uint8_t tickSession ) {
+	UBase_t rlt = 0;
+	
     suspendScheduler();
 
-    currentTCB->tickCountSession = session；
+    currentTCB->tickCountSession = tickSession;
     currentTCB->delayExpireAt = ticks;
 
     currentTaskItem->sortValue = currentTCB->delayExpireAt;
@@ -442,9 +447,11 @@ UBase_t resumeScheduler(void) {
 
     if ( schedulerSuspended == 0 ) { // 开启调度，保证函数可重入
         //  产生一个PendSV中断
-        willingAssert( sysTickService() == wTRUE );
-            
-        NVIC_INTERRUPUT_CTRL_REG = NVIC_PENDSV_SET_BIT;
+			//willingAssert( sysTickService() == wTRUE ); // todo： 用assert会导致timer那边出问题,todo:调试sleep
+        if( sysTickService() == wTRUE ) {
+					NVIC_INTERRUPUT_CTRL_REG = NVIC_PENDSV_SET_BIT;
+				}
+        
     }
 
     return schedulerSuspended;
@@ -470,7 +477,7 @@ void processDelay( void ) {
 		}
 }
 
-void 
+
 
 void initKernel( void ) {
     readyTaskList.head = NULL;

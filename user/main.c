@@ -6,6 +6,7 @@
 #include "stm32f10x_rcc.h"
 #include "led.h"
 #include <stdlib.h>
+#include "timer.h"
 
 
 
@@ -31,6 +32,11 @@ void testMem (void) {
 	 
 }
 
+
+void timerTaskLed1(void * param) {
+	      led1Stat = !led1Stat;
+        LED1 = led1Stat;
+}
 
 int main() {
 
@@ -67,8 +73,18 @@ int main() {
 
    // 创建任务
    ENTER_CRITICAL_SECTION();
+	 
+	 
+	 createTimer_ms(
+    1,
+    50, // todo: 定时器时间不对，可能也跟timerTask函数有关
+    TIMER_MOD_REPEAT,
+    timerTaskLed1,
+    NULL
+   );
+	 
 
-   createTask( (TaskFunc_t) lightLed1,
+/*   createTask( (TaskFunc_t) lightLed1,
                (const char *) "lightLed1",
                (uint32_t  ) 20,
                (void *) NULL,
@@ -77,7 +93,7 @@ int main() {
 
 							 			 
 							 
-/*    createTask( (TaskFunc_t) lightLed2,
+    createTask( (TaskFunc_t) lightLed2,
             (const char *) "lightLed2",
             (uint32_t  ) 50,
             (void *) NULL,

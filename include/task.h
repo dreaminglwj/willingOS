@@ -21,10 +21,11 @@ Base_t sysTickService( void );
 Base_t getSchedulerState( void );
 void taskSwitchContext( void );
 void OSStart(void);
-void reassignTimerTaskExpireTime( uint32_t expireAt, uint6_t tickSession )
+void reassignTimerTaskExpireTime( uint32_t expireAt, uint8_t tickSession );
 void OSStop(void);
 uint8_t calculateTickCount_ms( uint32_t nms, uint32_t * ticksWait );
 void willingSleep_ms( uint32_t n ); // 单位ms
+void willingSleep_ticks( int32_t ticks, uint8_t tickSession );
 void suspendScheduler(void);
 UBase_t resumeScheduler(void);
 void processDelay( void );

@@ -8,6 +8,8 @@ typedef struct timerCommand
     uint32_t timeOutAt; /* 超时时间 */
     uint8_t   tickCountSession;
     uint32_t timeOutSet; /* 超时间隔时间 */
+	
+	  void * param;
 
     uint16_t timerId;
 } TimerCommand_t ;
@@ -21,9 +23,9 @@ void processTimerCmd( void );
 TimerCmdHandle_t createTimer_ms(
     uint16_t id,
     uint32_t waitTime, // 延迟时间，单位ms
-    TimerMod_t timerMod;
-    TimerCmdFunc_t timerCommand;
-    void * param;
+    TimerMod_t timerMod,
+    TimerCmdFunc_t timerCommand,
+    void * param
 ) {
     // 计算tickCount
 
@@ -36,6 +38,7 @@ TimerCmdHandle_t createTimer_ms(
     timerCmd->timerCmd = timerCommand;
     timerCmd->timerMod = timerMod;
     timerCmd->timerId = id;
+	  timerCmd->param = param;
 
     cmdItem->tcbWith = timerCmd; // 借用tcbWith来存储cmd
     // cmdItem->listWith = &timerCmdList;
@@ -49,6 +52,8 @@ TimerCmdHandle_t createTimer_ms(
     if ( cmdItem == timerCmdList.head ) { // 如果新插入的cmd在第一个，说明延时值是最小的，需要调整timerTask的sleep值
         readjustTimerTaskWaitTime( timerCmd->timeOutAt, timerCmd->tickCountSession  );
     }
+		
+		return (TimerCmdHandle_t)timerCmd;
 }
 
 void timerTask(void * param) {
@@ -64,8 +69,8 @@ void timerTask(void * param) {
         } else {
             willingAssert( cmdItem );
             timerCmd = (TimerCommand_t*)(cmdItem->tcbWith);
-
-            suspendScheduler();
+					if ( timerCmd->tickCountSession == tickCountSession && timerCmd->timeOutAt <= tickCount ) {
+							 suspendScheduler();
 
             timerCmd->timerCmd( timerCmd->param );
             removeWillingListItem(&timerCmdList, cmdItem );
@@ -74,18 +79,24 @@ void timerTask(void * param) {
                 // todo: 考虑改成基于系统的tickCount和tickCountSession计算
                 uint32_t timeOutAt = timerCmd->timeOutAt + timerCmd->timeOutSet;
                 if ( timeOutAt < timerCmd->timeOutAt ) {
-                    timerCmd->tickCountSession = !(timerCmd->tickCountSession)
-                    timerCmd->timeOutAt = timeOutAt;
-                    cmdItem->sortValue = timeOutAt;
+                    timerCmd->tickCountSession = !(timerCmd->tickCountSession);
                     cmdItem->tickCountSession = timerCmd->tickCountSession;
                 }
+								   timerCmd->timeOutAt = timeOutAt;
+                   cmdItem->sortValue = timeOutAt;
 
                 willingAssert( insertWillingList_SortASC( &timerCmdList, cmdItem ) );
             }
 
             resumeScheduler();
+						cmdItem = timerCmdList.head;
+						} else {
+						   willingSleep_ticks( timerCmd->timeOutAt, timerCmd->tickCountSession );
+						}
 
-            cmdItem = timerCmdList.head;
+
+
+            
         }
     }
 }
@@ -106,7 +117,7 @@ void processTimerCmd( void ) {
 
 
 void readjustTimerTaskWaitTime( uint32_t timeOutAt, uint32_t tickSession ) {
-    reassignTimerTaskExpireTime( timeOutAt, tickSession )
+    reassignTimerTaskExpireTime( timeOutAt, tickSession );
 }
   
 

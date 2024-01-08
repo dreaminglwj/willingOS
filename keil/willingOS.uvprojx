@@ -432,6 +432,11 @@
               <FileType>5</FileType>
               <FilePath>..\include\list.h</FilePath>
             </File>
+            <File>
+              <FileName>timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\include\timer.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -529,6 +534,16 @@
               <FileName>list.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\core\list\list.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>timer</GroupName>
+          <Files>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\core\timer\timer.c</FilePath>
             </File>
           </Files>
         </Group>
