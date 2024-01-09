@@ -77,7 +77,7 @@ int main() {
 	 
 	 createTimer_ms(
     1,
-    50, // todo: 定时器时间不对，可能也跟timerTask函数有关
+    500, // todo: 定时器时间不对，可能也跟timerTask函数有关
     TIMER_MOD_REPEAT,
     timerTaskLed1,
     NULL

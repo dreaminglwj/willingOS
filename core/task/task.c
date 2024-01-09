@@ -348,7 +348,7 @@ void OSStart(void) {
 
 void reassignTimerTaskExpireTime( uint32_t expireAt, uint8_t tickSession ) {
 	if( timerTaskHandler != NULL ) { // 有可能在创建timer的时候timerTask还没有启动，所以需要在创建timerTask的时候去检查时间最小的timer
-			TCB_t * timerTCB = (TCB_t*) timerTaskHandler;
+		TCB_t * timerTCB = (TCB_t*) timerTaskHandler;
     timerTaskItem->sortValue = expireAt;
     timerTaskItem->tickCountSession = tickSession;
     

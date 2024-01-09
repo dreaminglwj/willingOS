@@ -11,7 +11,7 @@
 /******************************************************************
             时钟相关定义                                                
 ******************************************************************/
-#define SYS_TICK_RATE ((uint32_t) 10)
+#define SYS_TICK_RATE ((uint32_t) 100)
 #define SYS_TICK_CLOCK_RATE (SysClockFrequence)
 
 #define DELAY_VALUE_NO_DELAY (0)

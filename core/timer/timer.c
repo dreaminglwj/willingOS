@@ -2,12 +2,12 @@
 
 typedef struct timerCommand
 {
+	volatile uint8_t   tickCountSession;
     TimerCmdFunc_t timerCmd; // 定时任务函数
     TimerMod_t timerMod;
 
-    uint32_t timeOutAt; /* 超时时间 */
-    uint8_t   tickCountSession;
-    uint32_t timeOutSet; /* 超时间隔时间 */
+    volatile uint32_t timeOutAt; /* 超时时间 */
+    volatile uint32_t timeOutSet; /* 超时间隔时间 */
 	
 	  void * param;
 
@@ -56,6 +56,12 @@ TimerCmdHandle_t createTimer_ms(
 		return (TimerCmdHandle_t)timerCmd;
 }
 
+
+// todo：目前存在每次timerTask睡眠后再唤醒timeOutSet值变成TimeOutAt值，导致延时叠加越来越长的问题
+// 据调试发现，问题发生在第二次cmd执行后的第二次pendSV执行完，之后进入到for循环的时候
+// 为什么需要发生两次pendSV?  第一次在resumeScheduler的时候，第二次在sleep结束
+// 那么是否有必要在resume的时候切换一次呢？
+// 又为什么会在sleep之后timeOutSet的值会变呢？
 void timerTask(void * param) {
     // 查找超时的cmd进行调用
     // 如果是循环调用的cmd，重设延时值，从队列删除cmd，重新插入（重排序）
@@ -69,27 +75,29 @@ void timerTask(void * param) {
         } else {
             willingAssert( cmdItem );
             timerCmd = (TimerCommand_t*)(cmdItem->tcbWith);
+					
 					if ( timerCmd->tickCountSession == tickCountSession && timerCmd->timeOutAt <= tickCount ) {
 							 suspendScheduler();
 
-            timerCmd->timerCmd( timerCmd->param );
-            removeWillingListItem(&timerCmdList, cmdItem );
-            if ( timerCmd->timerMod == TIMER_MOD_REPEAT ) {
-                // 直接在timerCmd上次超时上加，保证每次执行的interval是一样的，但是当超时过短（比任务执行时间短）时有可能产生任务堆积
-                // todo: 考虑改成基于系统的tickCount和tickCountSession计算
-                uint32_t timeOutAt = timerCmd->timeOutAt + timerCmd->timeOutSet;
-                if ( timeOutAt < timerCmd->timeOutAt ) {
-                    timerCmd->tickCountSession = !(timerCmd->tickCountSession);
-                    cmdItem->tickCountSession = timerCmd->tickCountSession;
-                }
+               timerCmd->timerCmd( timerCmd->param ); // 执行命令
+						
+               removeWillingListItem(&timerCmdList, cmdItem );
+               if ( timerCmd->timerMod == TIMER_MOD_REPEAT ) {
+                   // 直接在timerCmd上次超时上加，保证每次执行的interval是一样的，但是当超时过短（比任务执行时间短）时有可能产生任务堆积
+                   // todo: 考虑改成基于系统的tickCount和tickCountSession计算
+                   uint32_t timeOutAt = timerCmd->timeOutAt + timerCmd->timeOutSet;
+                   if ( timeOutAt < timerCmd->timeOutAt ) {
+                      timerCmd->tickCountSession = !(timerCmd->tickCountSession);
+                      cmdItem->tickCountSession = timerCmd->tickCountSession;
+                   }
 								   timerCmd->timeOutAt = timeOutAt;
                    cmdItem->sortValue = timeOutAt;
 
-                willingAssert( insertWillingList_SortASC( &timerCmdList, cmdItem ) );
-            }
+                   willingAssert( insertWillingList_SortASC( &timerCmdList, cmdItem ) );
+               }
 
-            resumeScheduler();
-						cmdItem = timerCmdList.head;
+               resumeScheduler();
+						   cmdItem = timerCmdList.head;
 						} else {
 						   willingSleep_ticks( timerCmd->timeOutAt, timerCmd->tickCountSession );
 						}
