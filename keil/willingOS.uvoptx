@@ -215,7 +215,7 @@
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>timerCmd-&gt;timeOutSet</ItemText>
+          <ItemText>timerCmd-&gt;timeOutIntervalSet</ItemText>
         </Ww>
         <Ww>
           <count>10</count>

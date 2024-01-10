@@ -26,8 +26,6 @@
 
 static void taskExitError( void )
 {
-	// configASSERT( uxCriticalNesting == ~0UL );
-	// portDISABLE_INTERRUPTS();
 	for( ;; );
 }
 
@@ -238,10 +236,12 @@ __asm void pendSVHandler( void ) {
     ldr r3, =currentTCB /* 将当前tcb的地址存储到r3 */
     ldr r2, [r3] /* 以r3中的内容为地址，将该地址中的数据传到R2中 */
 
-    stmdb r0!, {r4-r11} /* 保存剩下的寄存器值 */
-    str r0, [r2] /* 将r0寄存器的值（PSP）保存到currentTCB指向的任务控制块中，即将PSP的值保存为任务的堆栈指针，因为tcb中stack在最上面 */
+    stmdb r0!, {r4-r11} /* 保存剩下的寄存器值，R4~R11这些寄存器系统不会主动入栈，需要手动推到当前任务的堆栈 */
+    str r0, [r2] /* 保存当前任务的栈顶指针：将r0寄存器的值（PSP）保存到currentTCB指向的任务控制块中，即将PSP的值保存为任务的堆栈指针，因为tcb中stack在最上面 */
 
+   // 保护现场，调用函数更新下一个准备运行的新任务
     stmdb sp!, {r3, r14}
+    // 设置优先级：进入临界区
     mov r0, #MAX_SYS_INTERRUPT_PRIORITY  
     msr basepri, r0
     dsb
@@ -249,17 +249,15 @@ __asm void pendSVHandler( void ) {
     bl taskSwitchContext
     mov r0, #0
     msr basepri, r0
-    ldmia sp!, {r3, r14}
+    ldmia sp!, {r3, r14} // 退出临界区
 
-    ldr r1, [r3]
-    ldr r0, [r1]
-    ldmia r0!, {r4-r11}
-    msr psp, r0
+    ldr r1, [r3] // 取出新的currentTCB值保存到r1
+    ldr r0, [r1] // 取出新任务的栈顶指针
+    ldmia r0!, {r4-r11} // 恢复手动保存的寄存器
+    msr psp, r0 // 使psp指向新任务的栈顶
     isb
-    bx r14
+    bx r14 // 返回，硬件执行现场恢复，开始执行任务
     nop
-	
-
 }
 
 /* 用于测试pendsv是否被调用 */
@@ -272,6 +270,4 @@ void pendSVHandler1( void ) {
 	
    //bl sharling
 	 //mov pc,lr
-	
-
 }
