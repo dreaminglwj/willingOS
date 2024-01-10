@@ -3,6 +3,7 @@
 
 #include "coreDef.h"
 
+#define MIN_TCB_STACK_SIZE (24U)
 
 /* 任务句柄，可以用于删除任务 */
 typedef void * TaskHandle_t;

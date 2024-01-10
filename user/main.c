@@ -32,11 +32,20 @@ void testMem(void)
    }
 }
 
+
+
+
+
 void timerTaskLed1(void *param)
 {
    led1Stat = !led1Stat;
    LED1 = led1Stat;
 }
+
+
+
+
+
 
 int main()
 {
@@ -72,25 +81,42 @@ int main()
    // 创建任务
    ENTER_CRITICAL_SECTION();
 
-   createTimer_ms(
+
+
+
+
+
+
+/*   createTimer_ms(
        1,
-       500, // todo: 定时器时间不对，可能也跟timerTask函数有关
+       500, 
        TIMER_MOD_REPEAT,
        timerTaskLed1,
        NULL);
+*/
 
-   /*   createTask( (TaskFunc_t) lightLed1,
+
+
+
+
+
+// todo: 定时器时间不对，可能也跟timerTask函数有关
+
+
+
+/* bug:202401102317,timer调通了，task挂了*/
+      createTask( (TaskFunc_t) lightLed1,
                   (const char *) "lightLed1",
-                  (uint32_t  ) 20,
+                  (uint32_t  ) 24,
                   (void *) NULL,
                   (UBase_t)SUGGESTED_PRIORITY,
                   (TaskHandle_t *)lightLed1Handler);
 
 
 
-       createTask( (TaskFunc_t) lightLed2,
+/*       createTask( (TaskFunc_t) lightLed2,
                (const char *) "lightLed2",
-               (uint32_t  ) 50,
+               (uint32_t  ) 24,
                (void *) NULL,
                (UBase_t) SUGGESTED_PRIORITY,
                (TaskHandle_t *)lightLed2Handler);*/

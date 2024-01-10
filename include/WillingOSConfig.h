@@ -45,7 +45,7 @@
 /****************************************************************
             timer相关定义                        
 ****************************************************************/
-#define USE_WILLING_SYS_TIMER
+//#define USE_WILLING_SYS_TIMER
 #ifdef USE_WILLING_SYS_TIMER
     #define TIMER_IDLE_DELAY_VALUE 500 // ms
 #endif

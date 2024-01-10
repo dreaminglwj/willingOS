@@ -7,6 +7,7 @@
 #include "WillingOSConfig.h"
 #include "memory.h"
 
+#ifdef USE_WILLING_SYS_TIMER
 typedef void * TimerCmdHandle_t;
 
 typedef  uint8_t TimerMod_t;
@@ -25,5 +26,7 @@ TimerCmdHandle_t createTimer_ms(
     TimerCmdFunc_t timerCommand,
     void * param
 );
+
+#endif
 
 #endif

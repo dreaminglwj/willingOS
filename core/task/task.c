@@ -47,8 +47,10 @@ ListItem_t *nextTaskItem = NULL; /* 在sysTickService中确定要不要调度的
                                                        避免在switch的时候再来遍历链表。
                                                        todo：测试会不会产生调度之前又发生变化的问题 */
 TaskHandle_t idleTaskHandler;
-TaskHandle_t timerTaskHandler;
-ListItem_t *timerTaskItem;
+#ifdef USE_WILLING_SYS_TIMER
+  TaskHandle_t timerTaskHandler;
+  ListItem_t *timerTaskItem;
+#endif
 
 static void initTask(TaskFunc_t taskFunc,
                      const char *const taskName,
@@ -79,6 +81,7 @@ Long_t createTask(TaskFunc_t taskFunc,        /* 任务函数 */
     {
         Stack_t *stack;
 
+        willingAssert( stackSize >= MIN_TCB_STACK_SIZE );
         stack = (Stack_t *)willingMalloc(((size_t)stackSize) * sizeof(Stack_t));
 
         if (stack != NULL)
@@ -127,7 +130,7 @@ static void initTask(TaskFunc_t taskFunc,
 #if (STACK_GROWTH == STACK_GROWTH_DOWN)
     {
         topOfStack = tcb->stack + (stackSize - (uint32_t)1);
-        topOfStack = (Stack_t *)(((willingPOINTER_SIZE_TYPE)topOfStack) & (~((willingPOINTER_SIZE_TYPE)BYTE_ALIGNMENT_MASK)));
+        //topOfStack = (Stack_t *)(((willingPOINTER_SIZE_TYPE)topOfStack) & (~((willingPOINTER_SIZE_TYPE)BYTE_ALIGNMENT_MASK)));
 
         // 检查溢出
     }
@@ -341,19 +344,21 @@ void OSStart(void)
 
     DISABLE_INTERRUPTS();
 
+	#ifdef USE_WILLING_SYS_TIMER
     createTask((TaskFunc_t)timerTask,
                (const char *)"timerTask",
-               (uint32_t)20,
+               (uint32_t)24,
                (void *)NULL,
                (UBase_t)MAX_PRIORITY_VALUE,
                (TaskHandle_t *)timerTaskHandler);
 
     timerTaskItem = sysReadyTaskList.tail;  // 因为系统中只有一个timerTask，为了避免循环查找，直接记录其值就好
+	#endif
 
     // idleTask，由于优先级比较低，所以当有其他任务的时候，idletask是不会被执行的
     createTask((TaskFunc_t)idleTask,
                (const char *)"idleTask",
-               (uint32_t)20,
+               (uint32_t)24,
                (void *)NULL,
                (UBase_t)MIN_PRIORITY_VALUE,
                (TaskHandle_t *)idleTaskHandler);
@@ -369,6 +374,7 @@ void OSStart(void)
     }
 }
 
+#ifdef USE_WILLING_SYS_TIMER
 void reassignTimerTaskExpireTime(uint32_t expireAt, uint8_t tickSession)
 {
     if (timerTaskHandler != NULL)
@@ -381,6 +387,7 @@ void reassignTimerTaskExpireTime(uint32_t expireAt, uint8_t tickSession)
         timerTCB->tickCountSession = tickSession;
     }
 }
+#endif
 
 void OSStop(void)
 {
@@ -518,5 +525,7 @@ void initKernel(void)
     tickCountSession = 0;
     tickCount = 0;
 
+	#ifdef USE_WILLING_SYS_TIMER
     timerTaskItem = NULL;
+	#endif
 }

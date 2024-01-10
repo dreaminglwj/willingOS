@@ -1,5 +1,7 @@
 #include "timer.h"
 
+#ifdef USE_WILLING_SYS_TIMER
+
 typedef struct timerCommand
 {
     TimerCmdFunc_t timerCmd; // 定时任务函数
@@ -55,11 +57,13 @@ TimerCmdHandle_t createTimer_ms(
     return (TimerCmdHandle_t)timerCmd;
 }
 
-// todo：目前存在每次timerTask睡眠后再唤醒timeOutSet值变成TimeOutAt值，导致延时叠加越来越长的问题
+// todo：bug202401090001：目前存在每次timerTask睡眠后再唤醒timeOutSet值变成TimeOutAt值，导致延时叠加越来越长的问题
 // 据调试发现，问题发生在第二次cmd执行后的第二次pendSV执行完，之后进入到for循环的时候
 // 为什么需要发生两次pendSV?  第一次在resumeScheduler的时候，第二次在sleep结束
 // 那么是否有必要在resume的时候切换一次呢？
 // 又为什么会在sleep之后timeOutSet的值会变呢？
+// 20240110:今天调试的结果是timeOutSet变成了0，发生位置是pendSVHandler  stmdb r0!, {r4-r11},已明确，是因为stackTop地址溢出，跟timerCmd->timeOutIntervalSet地址重合
+// bug原因：因为tcb的stack分配的空间小了（20），而stack中要保存初始化的值，占16word，实际切换的时候使用8word，所以是24word，超出的4个word正好溢出到了timercmd->set上
 void timerTask(void *param)
 {
     // 查找超时的cmd进行调用
@@ -116,27 +120,10 @@ void timerTask(void *param)
     }
 }
 
-void processTimerCmd(void)
-{
-    ListItem_t *cmdItem = timerCmdList.head;
-    TimerCommand_t *timerCmd = NULL;
-
-    while (cmdItem != NULL)
-    {
-        timerCmd = (TimerCommand_t *)cmdItem->tcbWith;
-        if (timerCmd->tickCountSession == tickCountSession && timerCmd->timeOutAt >= tickCount)
-        {
-            // 执行
-        }
-        else
-        { // 调整sleep值
-            willingSleep_ticks(timerCmd->timeOutAt, timerCmd->tickCountSession);
-        }
-    }
-}
 
 void readjustTimerTaskWaitTime(uint32_t timeOutAt, uint32_t tickSession)
 {
     reassignTimerTaskExpireTime(timeOutAt, tickSession);
 }
- 
+
+#endif
