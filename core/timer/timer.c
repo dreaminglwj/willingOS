@@ -106,6 +106,8 @@ void timerTask(void *param)
                     willingAssert(insertWillingList_SortASC(&timerCmdList, cmdItem));
                 } else {
                     // 释放cmd和item
+										willingFree(timerCmd);
+										willingFree(cmdItem);
                 }
 
                 resumeScheduler();
