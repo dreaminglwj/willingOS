@@ -1,0 +1,5 @@
+../Src/Libraries/STM32F10x_StdPeriph_Driver/src/misc.c:96:6:NVIC_PriorityGroupConfig	1
+../Src/Libraries/STM32F10x_StdPeriph_Driver/src/misc.c:112:6:NVIC_Init	2
+../Src/Libraries/STM32F10x_StdPeriph_Driver/src/misc.c:156:6:NVIC_SetVectorTable	1
+../Src/Libraries/STM32F10x_StdPeriph_Driver/src/misc.c:175:6:NVIC_SystemLPConfig	2
+../Src/Libraries/STM32F10x_StdPeriph_Driver/src/misc.c:199:6:SysTick_CLKSourceConfig	2

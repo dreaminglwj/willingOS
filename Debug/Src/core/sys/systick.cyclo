@@ -1,0 +1,5 @@
+../Src/core/sys/systick.c:6:6:setSysTickClkSource	4
+../Src/core/sys/systick.c:17:6:initSysTick	1
+../Src/core/sys/systick.c:37:6:delay_ms	3
+../Src/core/sys/systick.c:53:6:delay_us	3
+../Src/core/sys/systick.c:66:6:delay_xms	1

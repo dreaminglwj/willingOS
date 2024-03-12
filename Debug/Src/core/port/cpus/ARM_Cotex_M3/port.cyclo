@@ -1,0 +1,17 @@
+../Src/core/port/cpus/ARM_Cotex_M3/coreDef.h:220:33:maximizeBasePriority	1
+../Src/core/port/cpus/ARM_Cotex_M3/coreDef.h:231:33:clearBasePriorityFromISR	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:27:13:taskExitError	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:32:10:initStack	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:50:10:setInterruptMaskFromISR	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:57:6:clearInterruptMaskFromISR	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:66:6:sysTickHandler	3
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:96:6:ensureHighestISRPriority	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:118:6:setupTimerInterrupt	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:126:8:startWillingScheduler	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:142:6:stopWillingScheduler	2
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:146:6:enterCriticalSection	3
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:156:6:exitCriticalSection	3
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:177:7:SVC_Handler	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:205:6:startFirstTask	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:225:7:PendSV_Handler	1
+../Src/core/port/cpus/ARM_Cotex_M3/port.c:268:6:pendSVHandler1	1

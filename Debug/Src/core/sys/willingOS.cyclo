@@ -1,0 +1,3 @@
+../Src/core/sys/willingOS.c:10:6:initWilling	1
+../Src/core/sys/willingOS.c:22:6:initNVICPriorityGroup	1
+../Src/core/sys/willingOS.c:27:6:willingStart	1

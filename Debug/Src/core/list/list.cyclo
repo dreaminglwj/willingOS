@@ -1,0 +1,12 @@
+../Src/core/list/list.c:4:6:initWillingList	2
+../Src/core/list/list.c:16:9:insertWillingList_SortASC	11
+../Src/core/list/list.c:66:9:insertWillingList_Tail	4
+../Src/core/list/list.c:87:9:insertWillingList_Head	4
+../Src/core/list/list.c:108:9:insertWillingList_Behind	6
+../Src/core/list/list.c:141:9:getWillingListItemNum	2
+../Src/core/list/list.c:162:14:getWillingListNextItem	4
+../Src/core/list/list.c:170:14:getWillingListNextItem_Circle	5
+../Src/core/list/list.c:182:14:getWillingListPreviousItem	4
+../Src/core/list/list.c:190:14:getWillingListHeadItem	2
+../Src/core/list/list.c:198:14:getWillingListTailItem	2
+../Src/core/list/list.c:218:9:removeWillingListItem	8
